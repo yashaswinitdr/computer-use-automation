@@ -1,0 +1,7 @@
+{
+  "tenant_id": "fccu",
+  "app_profile": "acme-coreteller@4.2",
+  "base_url": "http://127.0.0.1:5055",
+  "secrets": {"teller_user": "FCCU_TELLER_USER", "teller_password": "FCCU_TELLER_PASSWORD"},
+  "aliases": {}
+}

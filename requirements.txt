@@ -1,0 +1,6 @@
+playwright>=1.49
+flask>=3.0
+pydantic>=2.7
+anthropic>=1.0
+openai>=1.40
+pytest>=8

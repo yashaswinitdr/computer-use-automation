@@ -1,0 +1,8 @@
+[
+  {"tool": "click", "args": {"target": {"frame": "nav", "role": "link", "name": "Member Inquiry"}}},
+  {"tool": "fill", "args": {"target": {"frame": "main", "role": "textbox", "name": "Member Number"}, "text": "10042", "param": "member_id"}},
+  {"tool": "click", "args": {"target": {"frame": "main", "role": "button", "name": "Search"}}},
+  {"tool": "extract", "args": {"output": "savings_balance", "type": "money", "sensitivity": "internal", "description": "Current balance of the member's share savings",
+     "source": {"kind": "table_cell", "frame": "main", "row_key_column": "Description", "row_key": "SHARE SAVINGS", "column": "Balance"}}},
+  {"tool": "finish", "args": {"summary": "read savings balance", "success_text": "SHARE SAVINGS"}}
+]

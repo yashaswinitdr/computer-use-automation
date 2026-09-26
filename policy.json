@@ -1,0 +1,43 @@
+{
+  "allowed_origins": [
+    "http://127.0.0.1:5055",
+    "http://127.0.0.1:5057"
+  ],
+  "allowed_routes": [
+    "/",
+    "/nav",
+    "/home",
+    "/login",
+    "/inq",
+    "/mbr/*",
+    "/sub/new",
+    "/sub/review",
+    "/sub/confirm",
+    "/notice/ack",
+    "/favicon.ico"
+  ],
+  "denied_routes": [
+    "/__*",
+    "/logout",
+    "/admin*"
+  ],
+  "allowed_actions": [
+    "click",
+    "fill",
+    "select",
+    "press",
+    "navigate",
+    "extract"
+  ],
+  "irreversible_names": [
+    "(?i)^(confirm|submit|post|transfer|delete|close account|approve)\\b"
+  ],
+  "write_names": [
+    "(?i)^(continue|save|next|update)\\b"
+  ],
+  "forbidden_names": [
+    "(?i)^(sign off|log ?out)\\b"
+  ],
+  "irreversible_mode": "require_approval",
+  "unattended_irreversible": []
+}

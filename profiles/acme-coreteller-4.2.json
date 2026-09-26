@@ -1,0 +1,55 @@
+{
+  "schema": "cua.app_profile/v1",
+  "id": "acme-coreteller",
+  "version": "4.2",
+  "vendor_product": "Acme CoreTeller 4.x (synthetic legacy core-banking teller app)",
+  "description": "Shared knowledge for every tenant running CoreTeller 4.2: how to sign on, how to recognise signed-out state, and the taxonomy of runtime states replay must handle. Authored once per vendor product version and reviewed like code.",
+  "signed_out_detect": [{"kind": "title", "frame": "main", "equals": "SIGN ON"}],
+  "sign_on_flow": "sign_on",
+  "flows": {
+    "sign_on": {
+      "steps": [
+        {"id": "so1", "intent": "Enter teller user id", "source": "authored", "risk": "write",
+         "action": {"type": "fill", "value": {"kind": "secret", "name": "teller_user"},
+                    "target": {"frame": "main", "role": "textbox", "name": "User ID", "fallbacks": [{"strategy": "css", "value": "input[name=\"f1\"]"}]}}},
+        {"id": "so2", "intent": "Enter teller password", "source": "authored", "risk": "write",
+         "action": {"type": "fill", "value": {"kind": "secret", "name": "teller_password"},
+                    "target": {"frame": "main", "role": "textbox", "name": "Password", "fallbacks": [{"strategy": "css", "value": "input[name=\"f2\"]"}]}}},
+        {"id": "so3", "intent": "Submit sign-on", "source": "authored", "risk": "read",
+         "action": {"type": "click", "target": {"frame": "main", "role": "button", "name": "Sign On"}},
+         "expect": {"all_of": [{"kind": "title", "frame": "main", "equals": "MAIN MENU"}], "timeout_ms": 10000}}
+      ],
+      "success": {"all_of": [{"kind": "title", "frame": "main", "equals": "MAIN MENU"}]}
+    }
+  },
+  "known_states": [
+    {"code": "host_abend", "classification": "hard_failure",
+     "description": "Host transaction abended (application error). Not retried: the host may have partially processed the request.",
+     "detect_any": [{"kind": "text", "regex": "ABEND \\w+"}], "message_regex": "(ABEND [^\n]+)"},
+    {"code": "sign_on_rejected", "classification": "hard_failure",
+     "description": "Service credentials rejected; retrying would risk locking the service account.",
+     "detect_any": [{"kind": "text", "frame": "main", "contains": "INVALID USER ID OR PASSWORD"}]},
+    {"code": "session_expired", "classification": "recoverable",
+     "description": "Host session timed out. Re-authenticate and restart the flow from the beginning (only if nothing irreversible has run).",
+     "detect_any": [{"kind": "text", "frame": "main", "contains": "SESSION EXPIRED"}],
+     "recovery": {"kind": "run_flow", "flow": "sign_on", "then": "restart", "max_attempts": 1}},
+    {"code": "signed_out", "classification": "recoverable",
+     "description": "Session is not authenticated. Sign on and restart.",
+     "detect_any": [{"kind": "title", "frame": "main", "equals": "SIGN ON"}],
+     "recovery": {"kind": "run_flow", "flow": "sign_on", "then": "restart", "max_attempts": 1}},
+    {"code": "system_notice", "classification": "recoverable",
+     "description": "Maintenance interstitial shown before the requested page. Acknowledge and continue.",
+     "detect_any": [{"kind": "title", "frame": "main", "equals": "SYSTEM NOTICE"}],
+     "recovery": {"kind": "click", "target": {"frame": "main", "role": "button", "name": "Acknowledge"}, "then": "resume", "max_attempts": 3}},
+    {"code": "member_not_found", "classification": "business",
+     "description": "No member exists with the supplied member number.",
+     "detect_any": [{"kind": "text", "frame": "main", "contains": "NO RECORD FOUND FOR MEMBER"}], "message_regex": "(NO RECORD FOUND[^\n]*)"},
+    {"code": "access_restricted", "classification": "business",
+     "description": "The member record is restricted for this operator (permission denial).",
+     "detect_any": [{"kind": "text", "frame": "main", "contains": "ACCESS DENIED"}], "message_regex": "(ACCESS DENIED[^\n]*)"},
+    {"code": "invalid_input", "classification": "business",
+     "description": "The host rejected an input value (validation error ERR nnnn).",
+     "detect_any": [{"kind": "text", "frame": "main", "regex": "ERR \\d{4}:"}], "message_regex": "(ERR \\d{4}:[^\n]*)"}
+  ],
+  "pii_labels": ["Name", "SSN", "Member"]
+}

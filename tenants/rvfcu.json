@@ -1,0 +1,7 @@
+{
+  "tenant_id": "rvfcu",
+  "app_profile": "acme-coreteller@4.2",
+  "base_url": "http://127.0.0.1:5057",
+  "secrets": {"teller_user": "RVFCU_TELLER_USER", "teller_password": "RVFCU_TELLER_PASSWORD"},
+  "aliases": {"Member Number": "Acct/Member #", "Search": "Find", "Balance": "Current Bal"}
+}

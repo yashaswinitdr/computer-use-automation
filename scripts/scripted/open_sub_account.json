@@ -1,0 +1,16 @@
+[
+  {"tool": "click", "args": {"target": {"frame": "nav", "role": "link", "name": "Member Inquiry"}}},
+  {"tool": "fill", "args": {"target": {"frame": "main", "role": "textbox", "name": "Member Number"}, "text": "20077", "param": "member_id"}},
+  {"tool": "click", "args": {"target": {"frame": "main", "role": "button", "name": "Search"}}},
+  {"tool": "click", "args": {"target": {"frame": "main", "role": "link", "name": "Open Sub-Account"}}},
+  {"tool": "select", "args": {"target": {"frame": "main", "role": "combobox", "name": "Share Type"}, "option": "HOLIDAY CLUB", "param": "share_type"}},
+  {"tool": "fill", "args": {"target": {"frame": "main", "role": "textbox", "name": "Nickname"}, "text": "XMAS FUND", "param": "nickname"}},
+  {"tool": "fill", "args": {"target": {"frame": "main", "role": "textbox", "name": "Initial Deposit"}, "text": "50.00", "param": "initial_deposit"}},
+  {"tool": "click", "args": {"target": {"frame": "main", "role": "button", "name": "Continue"}}},
+  {"tool": "click", "args": {"target": {"frame": "main", "role": "button", "name": "Confirm"}}},
+  {"tool": "extract", "args": {"output": "confirmation_number", "type": "string", "sensitivity": "internal", "description": "Host confirmation number",
+     "source": {"kind": "labeled_value", "frame": "main", "label": "Confirmation #"}}},
+  {"tool": "extract", "args": {"output": "suffix", "type": "string", "sensitivity": "internal", "description": "Suffix of the new sub-account",
+     "source": {"kind": "labeled_value", "frame": "main", "label": "Suffix"}}},
+  {"tool": "finish", "args": {"summary": "sub-account opened", "success_text": "OPENED"}}
+]

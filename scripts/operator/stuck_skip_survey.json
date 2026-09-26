@@ -1,0 +1,5 @@
+[
+  {"kind": "stuck", "claim": true,
+   "actions": [{"type": "click", "frame": "main", "role": "button", "name": "Remind Me Later", "pause_ms": 1200}],
+   "decision": "resume", "note": "Unknown survey screen; dismissed with 'Remind Me Later'. Consider adding it to the app profile."}
+]
