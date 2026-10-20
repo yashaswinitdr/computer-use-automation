@@ -30,6 +30,8 @@ SYSTEM_PROMPT = """You are the discovery agent of a computer-use automation syst
 You operate a legacy web application through tools, exactly one action per turn, to accomplish a GOAL.
 Your successful run is converted into a deterministic, replayable automation, so:
 - Take the most direct, conventional path a trained operator would take; avoid exploratory detours.
+- Read HISTORY before acting: never repeat an action that already succeeded. Each turn, look at what the
+  CURRENT screen offers (its fields and buttons) and take the next step on it.
 - Navigate with the application's own menus and links (there is no URL tool).
 - When you type or select a value that is one of the PARAMETERS, pass the parameter name in `param`, so it is
   recorded as an input rather than a constant.
@@ -149,7 +151,8 @@ class Discovery:
         lines.append("HISTORY:")
         lines += [f"  {h}" for h in history[-15:]] or ["  (nothing yet)"]
         lines.append("OBSERVATION:")
-        for f in obs.frames:
+        # Content frames first, navigation chrome last: the next step is usually on the content screen.
+        for f in sorted(obs.frames, key=lambda f: f.name == "nav"):
             if not f.name and not f.text.strip():
                 continue
             lines.append(f'## frame "{f.name}" path={f.path} title="{f.title}"')
@@ -266,12 +269,14 @@ class Discovery:
 
             if call.name == "extract":
                 msg = self._do_extract(args, params, outputs, specs, trace)
+                self.log.event("action_result", step=step, result=msg)
                 errors = 0 if msg.startswith("ok") else errors + 1
                 history.append(f"{step}. extract {args.get('output')}: {msg}")
                 continue
 
             if call.name in ("click", "fill", "select", "press"):
                 msg = self._do_ui(call.name, args, obs, params, trace, goal)
+                self.log.event("action_result", step=step, result=msg)
                 errors = 0 if not msg.startswith(("ERROR", "BLOCKED")) else errors + 1
                 history.append(f"{step}. {msg}")
                 continue

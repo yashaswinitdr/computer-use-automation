@@ -105,6 +105,52 @@ class OpenAILLM:
         return ToolCall(tc.function.name, args, msg.content, usage)
 
 
+class OllamaLLM:
+    """Local model served by Ollama (no API key; screen data never leaves the machine).
+
+    Uses Ollama's native /api/chat so the context window can be raised: observations are a few thousand
+    tokens and Ollama's default context would silently truncate them.
+    """
+
+    def __init__(self, model: str | None = None, host: str | None = None):
+        self.model = model or "llama3.2"
+        self.host = (host or os.environ.get("OLLAMA_HOST") or "http://127.0.0.1:11434").rstrip("/")
+
+    def decide(self, system: str, user: str, tools: list[dict[str, Any]], obs: Any = None) -> ToolCall:
+        import urllib.error
+        import urllib.request
+
+        body = {
+            "model": self.model,
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+            "tools": [{"type": "function", "function": t} for t in tools],
+            "stream": False,
+            "options": {"num_ctx": 16384, "temperature": 0},
+        }
+        req = urllib.request.Request(f"{self.host}/api/chat", data=json.dumps(body).encode(),
+                                     headers={"Content-Type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=600) as r:
+                resp = json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            raise LLMError(f"ollama error {e.code}: {e.read()[:200]!r}") from e
+        except OSError as e:
+            raise LLMError(f"ollama unreachable at {self.host}: {e}") from e
+        msg = resp.get("message", {})
+        usage = {"input_tokens": resp.get("prompt_eval_count"), "output_tokens": resp.get("eval_count")}
+        calls = msg.get("tool_calls") or []
+        if not calls:
+            return ToolCall("none", {}, msg.get("content"), usage)
+        fn = calls[0]["function"]
+        args = fn.get("arguments") or {}
+        if isinstance(args, str):
+            try:
+                args = json.loads(args)
+            except json.JSONDecodeError:
+                return ToolCall("none", {}, f"unparseable tool arguments: {args[:200]}", usage)
+        return ToolCall(fn["name"], args, msg.get("content"), usage)
+
+
 class ScriptedLLM:
     """Deterministic stand-in for offline tests/demos. NOT used for the evidence discovery run.
 
@@ -148,4 +194,6 @@ def make_llm(provider: str | None, model: str | None, script: str | None = None)
         return AnthropicLLM(model)
     if provider == "openai":
         return OpenAILLM(model)
+    if provider == "ollama":
+        return OllamaLLM(model)
     raise LLMError(f"unknown provider {provider}")

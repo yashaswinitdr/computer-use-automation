@@ -243,7 +243,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--id", required=True, help="capability id, e.g. coreteller.member.savings_balance")
     p.add_argument("--title")
     p.add_argument("--description")
-    p.add_argument("--provider", choices=["anthropic", "openai", "scripted"])
+    p.add_argument("--provider", choices=["anthropic", "openai", "ollama", "scripted"])
     p.add_argument("--model")
     p.add_argument("--script", help="scripted provider: JSON list of tool calls (offline tests only)")
     p.add_argument("--max-steps", type=int, default=20)
