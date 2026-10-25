@@ -143,9 +143,41 @@ outcome class.
 python scripts/demo.py
 ```
 
+## Web app (API + dashboard)
+
+The same engine also runs as a small full-stack service:
+
+- a **FastAPI** REST API (`cua/api.py`) with role-based API keys (agent / operator / reviewer / admin) and an audit log;
+- a **database** (SQLite by default, any SQLAlchemy URL via `CUA_DATABASE_URL`) for the capability registry, runs,
+  approval requests and control transfers;
+- a background **worker pool** that runs replays, with a per-tenant limit on concurrent sessions;
+- a **dashboard** (`cua/web/index.html`, plain HTML/JS) where you can run a capability from a generated form, watch
+  runs live, see results and screenshots, and approve, deny or take over requests from the human-in-the-loop queue.
+
+Run it locally (with the demo app from Setup running):
+
+```bash
+pip install -e ".[dev]"
+```
+
+```bash
+python -m cua keys create --name me --role admin
+```
+
+```bash
+python -m cua registry capabilities/*.json --keep-status
+```
+
+```bash
+python -m cua serve --port 8080
+```
+
+Open http://127.0.0.1:8080 and sign in with the printed key. The interactive API docs are at `/docs`.
+CI (`.github/workflows/ci.yml`) runs lint, type checks and the full test suite on every push.
+
 ## Tests
 
-The suite has 21 tests. It includes 12 end-to-end tests that drive a real Chromium against the app in-process: discovery (with a
+The suite has 28 tests. It includes 12 end-to-end tests that drive a real Chromium against the app in-process: discovery (with a
 scripted model stand-in), recording, replay, every result class, recoveries, approval gating, human handoff, and cross-tenant
 overlays. No API key is needed.
 

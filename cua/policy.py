@@ -38,7 +38,7 @@ class Policy(BaseModel):
     unattended_irreversible: list[str] = []
 
     @classmethod
-    def load(cls, path: str | Path) -> "Policy":
+    def load(cls, path: str | Path) -> Policy:
         return cls.model_validate(json.loads(Path(path).read_text()))
 
     # ------------------------------------------------------------------ checks

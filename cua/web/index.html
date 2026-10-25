@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CUA Console</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1d2330; --muted:#6b7280; --line:#e3e6eb; --brand:#2453d6;
+          --ok:#13795b; --warn:#a15c00; --bad:#b42318; --chip:#eef2ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { display:flex; align-items:center; gap:16px; padding:12px 20px; background:var(--card); border-bottom:1px solid var(--line); }
+  header h1 { font-size:16px; margin:0; }
+  nav button { background:none; border:0; padding:8px 12px; border-radius:6px; cursor:pointer; color:var(--muted); font:inherit; }
+  nav button.active { background:var(--chip); color:var(--brand); font-weight:600; }
+  .who { margin-left:auto; color:var(--muted); font-size:13px; }
+  main { max-width:1100px; margin:20px auto; padding:0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:14px; }
+  h2 { font-size:15px; margin:0 0 10px; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:12px; color:var(--muted); font-weight:600; }
+  tr.click { cursor:pointer; } tr.click:hover { background:#fafbff; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:600; background:var(--chip); }
+  .succeeded { background:#e7f6ef; color:var(--ok); } .business_outcome { background:#fff4e0; color:var(--warn); }
+  .failed { background:#fde8e7; color:var(--bad); } .running,.queued { background:var(--chip); color:var(--brand); }
+  label { display:block; font-size:12px; color:var(--muted); margin:8px 0 4px; }
+  input, select, textarea { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font:inherit; }
+  button.primary { background:var(--brand); color:#fff; border:0; padding:8px 14px; border-radius:6px; cursor:pointer; font:inherit; margin-top:10px; }
+  button.ghost { background:#fff; border:1px solid var(--line); padding:6px 12px; border-radius:6px; cursor:pointer; font:inherit; margin-right:6px; }
+  button.danger { color:var(--bad); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px; }
+  .muted { color:var(--muted); } .small { font-size:12px; }
+  pre { background:#f3f4f6; padding:10px; border-radius:6px; overflow:auto; font-size:12px; margin:6px 0 0; }
+  img.shot { max-width:100%; border:1px solid var(--line); border-radius:6px; margin-top:8px; }
+  .shots { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; }
+  #login { max-width:420px; margin:80px auto; }
+  .error { color:var(--bad); margin-top:8px; }
+</style>
+</head>
+<body>
+<div id="login" class="card" hidden>
+  <h2>Sign in</h2>
+  <p class="muted small">Paste an API key (create one with <code>cua keys create --name you --role admin</code>).</p>
+  <input id="key" type="password" placeholder="cua_..." autocomplete="off">
+  <button class="primary" onclick="signIn()">Sign in</button>
+  <div id="loginErr" class="error"></div>
+</div>
+
+<div id="app" hidden>
+  <header>
+    <h1>Computer-Use Automation</h1>
+    <nav>
+      <button data-tab="caps">Capabilities</button>
+      <button data-tab="runs">Runs</button>
+      <button data-tab="hitl">Approvals <span id="hitlCount"></span></button>
+    </nav>
+    <span class="who" id="who"></span>
+    <button class="ghost" onclick="signOut()">Sign out</button>
+  </header>
+  <main id="view"></main>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let KEY = sessionStorage.getItem("cua_key") || "", ME = null, TAB = "caps", timer = null, openRun = null, GEN = 0;
+// Every view change bumps GEN; a refresh loop started for an older view stops itself instead of drawing over the new one.
+function every(ms, fn) { const g = GEN; const loop = async () => { if (g !== GEN) return; try { await fn(); } catch {} if (g === GEN) timer = setTimeout(loop, ms); }; return loop(); }
+
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: { "Authorization": "Bearer " + KEY, "Content-Type": "application/json", ...(opts.headers || {}) } });
+  if (r.status === 401) { signOut(); throw new Error("unauthorized"); }
+  const body = r.headers.get("content-type")?.includes("json") ? await r.json() : null;
+  if (!r.ok) throw new Error(typeof body?.detail === "string" ? body.detail : JSON.stringify(body?.detail ?? r.status));
+  return body;
+}
+async function imgURL(path) {  // evidence needs the auth header, so fetch it as a blob
+  const r = await fetch(path, { headers: { "Authorization": "Bearer " + KEY } });
+  return r.ok ? URL.createObjectURL(await r.blob()) : "";
+}
+
+async function signIn() {
+  KEY = $("#key").value.trim();
+  try { ME = await api("/v1/me"); sessionStorage.setItem("cua_key", KEY); start(); }
+  catch (e) { $("#loginErr").textContent = "That key was not accepted."; }
+}
+function signOut() { sessionStorage.removeItem("cua_key"); KEY = ""; location.reload(); }
+
+function start() {
+  $("#login").hidden = true; $("#app").hidden = false;
+  $("#who").textContent = `${ME.name} · ${ME.role}`;
+  document.querySelectorAll("nav button").forEach(b => b.onclick = () => show(b.dataset.tab));
+  show(TAB);
+  setInterval(refreshCount, 3000); refreshCount();
+}
+function show(tab) {
+  TAB = tab; openRun = null; GEN++; clearTimeout(timer);
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  ({ caps: renderCaps, runs: renderRuns, hitl: renderHitl })[tab]();
+}
+async function refreshCount() {
+  if (!["operator", "admin"].includes(ME.role)) return;
+  try { const n = (await api("/v1/interventions")).length; $("#hitlCount").innerHTML = n ? `<span class="pill failed">${n}</span>` : ""; } catch {}
+}
+
+/* ---------------- capabilities: catalog + invoke form generated from each tool's JSON schema ---------------- */
+async function renderCaps() {
+  const [caps, tenants] = await Promise.all([api("/v1/capabilities"), api("/v1/tenants")]);
+  $("#view").innerHTML = caps.length ? `<div class="grid">${caps.map((c, i) => `
+    <div class="card">
+      <h2>${esc(c["x-capability"])} <span class="pill">${esc(c.status)}</span></h2>
+      <p class="small muted">${esc(c.description)}</p>
+      <form onsubmit="invoke(event, ${i})">
+        <label>Tenant <select name="tenant_id">${tenants.map(t => `<option>${esc(t)}</option>`).join("")}</select></label>
+        ${Object.entries(c.parameters.properties).map(([k, s]) => `
+          <label>${esc(k)} <span class="muted">${esc(s.description || "")}</span>
+          ${s.enum ? `<select name="${esc(k)}">${s.enum.map(o => `<option>${esc(o)}</option>`).join("")}</select>`
+                   : `<input name="${esc(k)}" required>`}</label>`).join("")}
+        <button class="primary">Run</button> <span class="small muted" id="msg${i}"></span>
+      </form>
+    </div>`).join("")}</div>` : `<div class="card muted">No approved capabilities yet.</div>`;
+  window._caps = caps;
+}
+async function invoke(ev, i) {
+  ev.preventDefault();
+  const c = window._caps[i], f = new FormData(ev.target), inputs = {};
+  for (const k of Object.keys(c.parameters.properties)) inputs[k] = f.get(k);
+  const id = c["x-capability"].split("@")[0];
+  $("#msg" + i).textContent = "starting…";
+  try {
+    const r = await api(`/v1/capabilities/${id}/invoke`, { method: "POST", body: JSON.stringify({ tenant_id: f.get("tenant_id"), inputs }) });
+    show("runs"); openRunDetail(r.run_id);
+  } catch (e) { $("#msg" + i).textContent = "⚠ " + e.message; }
+}
+
+/* ---------------- runs: live list + detail with result and screenshots ---------------- */
+async function renderRuns() {
+  const draw = async () => {
+    if (openRun) return;
+    const runs = await api("/v1/runs?limit=30");
+    $("#view").innerHTML = `<div class="card"><h2>Recent runs</h2><table>
+      <tr><th>Run</th><th>Capability</th><th>Tenant</th><th>Status</th><th>Result</th><th>Started</th></tr>
+      ${runs.map(r => `<tr class="click" onclick="openRunDetail('${esc(r.run_id)}')">
+        <td class="small">${esc(r.run_id)}</td><td>${esc(r.capability)}</td><td>${esc(r.tenant_id)}</td>
+        <td><span class="pill ${esc(r.status)}">${esc(r.status)}</span></td><td class="small">${esc(summary(r))}</td>
+        <td class="small muted">${esc((r.created_at || "").replace("T", " ").slice(0, 19))}</td></tr>`).join("") || `<tr><td colspan=6 class="muted">No runs yet.</td></tr>`}
+    </table></div>`;
+  };
+  await every(2000, draw);
+}
+function summary(r) {
+  const x = r.result || {};
+  if (r.status === "succeeded") return Object.entries(x.outputs || {}).map(([k, v]) => `${k}=${v}`).join(", ");
+  if (r.status === "business_outcome") return x.outcome?.code;
+  if (r.status === "failed") return x.failure?.code || r.error;
+  return "";
+}
+async function openRunDetail(id) {
+  openRun = id; GEN++; clearTimeout(timer);
+  const g = GEN;
+  const draw = async () => {
+    const r = await api(`/v1/runs/${id}`);
+    const files = ["operator", "reviewer", "admin"].includes(ME.role) ? await api(`/v1/runs/${id}/files`) : [];
+    const x = r.result || {};
+    $("#view").innerHTML = `<div class="card">
+      <button class="ghost" onclick="show('runs')">← All runs</button>
+      <h2 style="margin-top:12px">${esc(r.capability)} <span class="pill ${esc(r.status)}">${esc(r.status)}</span></h2>
+      <p class="small muted">${esc(r.run_id)} · tenant ${esc(r.tenant_id)} · requested by ${esc(r.requested_by)}</p>
+      ${x.outputs && Object.keys(x.outputs).length ? `<h2>Outputs</h2><pre>${esc(JSON.stringify(x.outputs, null, 2))}</pre>` : ""}
+      ${x.outcome ? `<h2>Business outcome</h2><pre>${esc(JSON.stringify(x.outcome, null, 2))}</pre>` : ""}
+      ${x.failure ? `<h2>Failure</h2><pre>${esc(JSON.stringify(x.failure, null, 2))}</pre>` : ""}
+      ${(x.recoveries || []).length ? `<h2>Recovered automatically</h2><pre>${esc(JSON.stringify(x.recoveries, null, 2))}</pre>` : ""}
+      ${r.error ? `<h2>Error</h2><pre>${esc(r.error)}</pre>` : ""}
+      ${files.length ? `<h2>Screenshots (PII masked)</h2><div class="shots" id="shots"></div>` : ""}
+    </div>`;
+    for (const f of files) {
+      const img = document.createElement("img"); img.className = "shot"; img.src = await imgURL(`/v1/runs/${id}/evidence/${f}`);
+      $("#shots")?.appendChild(img);
+    }
+    if (g === GEN && ["queued", "running"].includes(r.status)) timer = setTimeout(draw, 1500);
+  };
+  await draw();
+}
+
+/* ---------------- approvals / human-in-the-loop queue ---------------- */
+async function renderHitl() {
+  const draw = async () => {
+    const reqs = await api("/v1/interventions");
+    if (!reqs.length) { $("#view").innerHTML = `<div class="card muted">No requests waiting for a human. 🎉</div>`; return; }
+    $("#view").innerHTML = reqs.map(q => `<div class="card">
+      <h2>${q.kind === "approval" ? "Approval needed" : "Automation is stuck"} <span class="pill">${esc(q.status)}</span></h2>
+      <p>${esc(q.reason)}</p>
+      <p class="small muted">${esc(q.subject)} · step ${esc(q.step_id)} ${q.proposed_action ? "· proposed: " + esc(q.proposed_action) : ""}
+         · control: <b>${esc(q.control.holder)}</b>${q.control.operator ? " (" + esc(q.control.operator) + ")" : ""}</p>
+      <div>${q.status === "open" && q.kind !== "approval" ? `<button class="ghost" onclick="act('${q.id}','claim')">Take control</button>` : ""}
+        ${q.allowed_decisions.map(d => `<button class="ghost ${d === "deny" ? "danger" : ""}" onclick="act('${q.id}','${d}')">${d[0].toUpperCase() + d.slice(1)}</button>`).join("")}
+        <button class="ghost danger" onclick="act('${q.id}','abort')">Abort run</button></div>
+      <img class="shot" data-src="/v1/runs/${esc(q.run_id)}/evidence/${esc(q.screenshot)}">
+    </div>`).join("");
+    for (const img of document.querySelectorAll("img[data-src]")) img.src = await imgURL(img.dataset.src);
+  };
+  await every(3000, draw);
+}
+async function act(id, what) {
+  try {
+    if (what === "claim") await api(`/v1/interventions/${id}/claim`, { method: "POST" });
+    else await api(`/v1/interventions/${id}/resolve`, { method: "POST", body: JSON.stringify({ decision: what }) });
+    refreshCount(); show("hitl");
+  } catch (e) { alert(e.message); }
+}
+
+(async () => {
+  if (KEY) { try { ME = await api("/v1/me"); return start(); } catch {} }
+  $("#login").hidden = false;
+})();
+</script>
+</body>
+</html>

@@ -401,7 +401,7 @@ class Discovery:
         if not raw:
             return "ERROR: nothing found with that source; check frame, captions and headers"
         sensitivity = args.get("sensitivity", "internal")
-        if kind == "labeled_value" and src.get("label", "").strip(" :").lower() in {l.lower() for l in self.pii_labels}:
+        if kind == "labeled_value" and src.get("label", "").strip(" :").lower() in {lbl.lower() for lbl in self.pii_labels}:
             sensitivity = "pii"  # policy, not the model, decides: values under the profile's PII captions are PII
         spec = OutputSpec(type=args.get("type", "string"), description=args.get("description", ""),
                           sensitivity=sensitivity)

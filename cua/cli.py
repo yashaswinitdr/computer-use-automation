@@ -9,7 +9,7 @@ import shutil
 import sys
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from cua import catalog as cat
@@ -145,7 +145,7 @@ def cmd_approve(args) -> int:
     cap = Capability.model_validate_json(p.read_text(encoding="utf-8"))
     cap.status = "approved"
     cap.provenance.reviewed_by = args.reviewer
-    cap.provenance.reviewed_at = datetime.now(timezone.utc)
+    cap.provenance.reviewed_at = datetime.now(UTC)
     p.write_text(cap.to_json(), encoding="utf-8")
     print(f"{cap.ref} approved by {args.reviewer}")
     return 0
@@ -208,6 +208,47 @@ def cmd_app(args) -> int:
     from target_app import server  # reads TENANT_VARIANT at import
 
     server.main()
+    return 0
+
+
+def cmd_serve(args) -> int:
+    import uvicorn
+
+    uvicorn.run("cua.api:create_app", factory=True, host=args.host, port=args.port, workers=1, log_level="info")
+    return 0
+
+
+def cmd_keys(args) -> int:
+    from cua.db import Database
+
+    db = Database()
+    db.create_all()
+    if args.op == "create":
+        key = db.create_api_key(args.name, args.role)
+        print(f"API key for {args.name} ({args.role}) -- shown once, store it securely:")
+        print(key)
+    else:
+        print(f"revoked {db.revoke_api_key(args.prefix)} key(s)")
+    return 0
+
+
+def cmd_registry(args) -> int:
+    """Import capability files into the service registry (as drafts unless --keep-status)."""
+    from cua.db import Database
+
+    db = Database()
+    db.create_all()
+    for f in args.files:
+        cap = Capability.model_validate_json(Path(f).read_text(encoding="utf-8"))
+        body = json.loads(cap.to_json())
+        if not args.keep_status:
+            body["status"] = "draft"
+        try:
+            row = db.put_capability(body, args.as_)
+            db.audit(args.as_, "admin", "capability.import", cap.ref, {"sha256": row.sha256, "file": str(f)})
+            print(f"imported {cap.ref} [{body['status']}] sha256={row.sha256[:12]}")
+        except ValueError as e:
+            print(f"skipped: {e}")
     return 0
 
 
@@ -294,6 +335,24 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--variant", default="a", choices=["a", "b"])
     p.add_argument("--port", type=int, default=5055)
     p.set_defaults(fn=cmd_app)
+
+    p = sub.add_parser("serve", help="run the REST API service")
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=8080)
+    p.set_defaults(fn=cmd_serve)
+
+    p = sub.add_parser("keys", help="manage API keys (stored hashed in the service database)")
+    p.add_argument("op", choices=["create", "revoke"])
+    p.add_argument("--name")
+    p.add_argument("--role", choices=["agent", "operator", "reviewer", "admin"])
+    p.add_argument("--prefix", help="revoke: the key's first 12 characters")
+    p.set_defaults(fn=cmd_keys)
+
+    p = sub.add_parser("registry", help="import capability files into the service registry")
+    p.add_argument("files", nargs="+")
+    p.add_argument("--keep-status", action="store_true", help="keep the file's approval status (default: draft)")
+    p.add_argument("--as", dest="as_", default=os.environ.get("USERNAME", "admin"))
+    p.set_defaults(fn=cmd_registry)
 
     p = sub.add_parser("keep", help="copy a run into evidence/<name>")
     p.add_argument("run_id")

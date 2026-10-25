@@ -187,7 +187,7 @@ class ScriptedLLM:
         self.model = "scripted"
 
     @classmethod
-    def from_file(cls, path: str) -> "ScriptedLLM":
+    def from_file(cls, path: str) -> ScriptedLLM:
         return cls(json.loads(Path(path).read_text(encoding="utf-8")))
 
     def decide(self, system: str, user: str, tools: list[dict[str, Any]], obs: Any = None) -> ToolCall:

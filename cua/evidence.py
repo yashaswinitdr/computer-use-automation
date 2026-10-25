@@ -14,7 +14,7 @@ import json
 import secrets
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -42,7 +42,7 @@ class RunLog:
         self._seq += 1
         rec = {
             "seq": self._seq,
-            "ts": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+            "ts": datetime.now(UTC).isoformat(timespec="milliseconds"),
             "t_ms": int((time.monotonic() - self._t0) * 1000),
             "type": type_,
             **self.redactor.obj(fields),

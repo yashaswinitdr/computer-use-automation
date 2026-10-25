@@ -13,7 +13,7 @@ Three layers, deliberately separated (see REPORT.md section 2):
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Annotated, Any, Literal, Union
 
@@ -28,7 +28,7 @@ class Strict(BaseModel):
 
 
 # ------------------------------------------------------------------------------------------------ values
-class Sensitivity(str, Enum):
+class Sensitivity(str, Enum):  # noqa: UP042 (str mixin keeps JSON values plain strings)
     public = "public"  # safe to log verbatim
     internal = "internal"  # logged verbatim inside the platform, never sent to third parties
     pii = "pii"  # masked in logs/evidence (e.g. member numbers, names)
@@ -257,7 +257,7 @@ class AppRef(Strict):
 
 class Provenance(Strict):
     method: Literal["llm_discovery", "authored"]
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     discovery_run_id: str | None = None
     model: str | None = None
     goal_template: str | None = None

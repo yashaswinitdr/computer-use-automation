@@ -27,7 +27,7 @@ def run(label: str, args: list[str], note: str) -> dict:
         out = json.loads(p.stdout)
     except json.JSONDecodeError:
         print(p.stdout)
-        raise SystemExit(f"{label}: command failed")
+        raise SystemExit(f"{label}: command failed") from None
     run_id = out["run_id"]
     dst = OUT / label
     if dst.exists():
@@ -57,7 +57,7 @@ def main() -> None:
         try:
             urllib.request.urlopen(f"http://127.0.0.1:{port}/nav", timeout=3)
         except OSError:
-            raise SystemExit(f"target app not running on :{port} (python -m cua app --variant {'a' if port == 5055 else 'b'} --port {port})")
+            raise SystemExit(f"target app not running on :{port} (python -m cua app --variant {'a' if port == 5055 else 'b'} --port {port})") from None
     llm = (["--provider", a.provider] if a.provider else []) + (["--model", a.model] if a.model else [])
     if a.provider == "scripted":
         llm += ["--script", "scripts/scripted/savings_balance.json"]
@@ -124,7 +124,8 @@ def main() -> None:
     (OUT / "capability.open_sub_account.review.txt").write_text(
         subprocess.run(PY + ["show", str(art2)], cwd=ROOT, capture_output=True, text=True, encoding="utf-8").stdout, encoding="utf-8")
     subprocess.run(PY + ["approve", str(art2), "--reviewer", "demo-reviewer"], cwd=ROOT, check=True)
-    sub_args = lambda d: json.dumps({"member_id": "10042", "share_type": "VACATION CLUB", "nickname": "BEACH", "initial_deposit": d})
+    def sub_args(d: str) -> str:
+        return json.dumps({"member_id": "10042", "share_type": "VACATION CLUB", "nickname": "BEACH", "initial_deposit": d})
     run("16-replay-sub-account-approved", ["replay", str(art2), "--args", sub_args("75.00"), "--operator-script", "scripts/operator/approve.json"],
         "irreversible step -> approval request -> approved -> committed")
     run("17-replay-sub-account-denied", ["replay", str(art2), "--args", sub_args("75.00"), "--operator-script", "scripts/operator/deny.json"],

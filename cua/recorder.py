@@ -16,9 +16,30 @@ from typing import Any
 
 from cua.agent.discovery import DiscoveryOutcome, TraceEntry
 from cua.schema import (
-    AppProfile, AppRef, Capability, Checkpoint, Click, Condition, Extract, Fallback, Fill, LabeledValue,
-    LiteralValue, OutcomeSpec, ParamSpec, ParamValue, Press, Provenance, RouteCond, Select, Step, TableCell,
-    Target, TextCond, TextRegex, TitleCond,
+    AppProfile,
+    AppRef,
+    Capability,
+    Checkpoint,
+    Click,
+    Condition,
+    Extract,
+    Fallback,
+    Fill,
+    LabeledValue,
+    LiteralValue,
+    OutcomeSpec,
+    ParamSpec,
+    ParamValue,
+    Press,
+    Provenance,
+    RouteCond,
+    Select,
+    Step,
+    TableCell,
+    Target,
+    TextCond,
+    TextRegex,
+    TitleCond,
 )
 
 

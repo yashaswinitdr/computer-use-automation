@@ -23,11 +23,12 @@ in a different process from the automation.
 
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import secrets
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal, Protocol
 
@@ -37,7 +38,7 @@ Decision = Literal["approve", "deny", "resume", "abort", "timeout"]
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 class ControlState(BaseModel):
@@ -96,7 +97,7 @@ class HandoffStore:
             return st
         return ControlState.model_validate_json(p.read_text(encoding="utf-8"))
 
-    def _transfer(self, run_id: str, holder: str, operator: str | None, reason: str) -> ControlState:
+    def _transfer(self, run_id: str, holder: Literal["automation", "human"], operator: str | None, reason: str) -> ControlState:
         cur = self.control(run_id)
         st = ControlState(run_id=run_id, holder=holder, epoch=cur.epoch + 1, operator=operator, reason=reason)
         self._write(self._dir(run_id) / "control.json", st)
@@ -122,6 +123,12 @@ class HandoffStore:
                 out.append(r)
         return out
 
+    def transfers(self, run_id: str) -> builtins.list[dict[str, Any]]:
+        p = self._dir(run_id) / "control_log.jsonl"
+        if not p.exists():
+            return []
+        return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
+
     def claim(self, run_id: str, req_id: str, operator: str) -> InterventionRequest:
         req = self.load(run_id, req_id)
         if req.status != "open":
@@ -144,11 +151,27 @@ class HandoffStore:
         return req
 
 
+class Store(Protocol):
+    """What the automation and operator sides need from a handoff store (file: HandoffStore, DB: DbHandoffStore)."""
+
+    root: Path
+
+    def control(self, run_id: str) -> ControlState: ...
+    def transfers(self, run_id: str) -> list[dict[str, Any]]: ...
+    def open_request(self, req: InterventionRequest) -> None: ...
+    def load(self, run_id: str, req_id: str) -> InterventionRequest: ...
+    def save(self, req: InterventionRequest) -> None: ...
+    def list(self, status: str | None = "open") -> list[InterventionRequest]: ...
+    def claim(self, run_id: str, req_id: str, operator: str) -> InterventionRequest: ...
+    def resolve(self, run_id: str, req_id: str, decision: Decision, operator: str,
+                note: str | None = None) -> InterventionRequest: ...
+
+
 class OperatorHook(Protocol):
     """Called while automation is blocked on a request. A real deployment's hook is a no-op (humans act through the
     console / live browser); ``SimulatedOperator`` uses it to stand in for a person in demos and tests."""
 
-    def tick(self, req: InterventionRequest, store: HandoffStore, surface: Any) -> None: ...
+    def tick(self, req: InterventionRequest, store: Store, surface: Any) -> None: ...
 
 
 class ControlLost(Exception):
@@ -158,7 +181,7 @@ class ControlLost(Exception):
 class Controller:
     """Automation-side half of the handoff seam."""
 
-    def __init__(self, store: HandoffStore, run_id: str, log, surface, operator: OperatorHook | None = None,
+    def __init__(self, store: Store, run_id: str, log, surface, operator: OperatorHook | None = None,
                  timeout_s: float = 900, pii_labels: list[str] | None = None):
         self.store, self.run_id, self.log, self.surface = store, run_id, log, surface
         self.operator = operator
@@ -173,7 +196,7 @@ class Controller:
         if st.holder != "automation":
             raise ControlLost(f"control held by {st.holder} ({st.operator}) at epoch {st.epoch}")
 
-    def escalate(self, kind: str, reason: str, subject: str, allowed: list[Decision], step_id: str | None = None,
+    def escalate(self, kind: Literal["stuck", "approval", "unrecoverable"], reason: str, subject: str, allowed: list[Decision], step_id: str | None = None,
                  step_intent: str | None = None, proposed_action: str | None = None) -> InterventionRequest:
         req_id = f"req-{secrets.token_hex(3)}"
         shot = f"screenshots/{req_id}.png"
@@ -226,13 +249,10 @@ class Controller:
             self.surface.on_human_action(None)
         cur.human_actions = captured
         self.store.save(cur)
-        log_path = self.store.root / self.run_id / "handoff" / "control_log.jsonl"
-        if log_path.exists():
-            for line in log_path.read_text(encoding="utf-8").splitlines():
-                t = json.loads(line)
-                if req_id in t.get("reason", ""):
-                    self.log.event("control_transferred", request=req_id, holder=t["holder"], operator=t["operator"],
-                                   epoch=t["epoch"], at=t["since"])
+        for t in self.store.transfers(self.run_id):
+            if req_id in t.get("reason", ""):
+                self.log.event("control_transferred", request=req_id, holder=t["holder"], operator=t["operator"],
+                               epoch=t["epoch"], at=t["since"])
         self.log.event("intervention_resolved", request=req_id, decision=cur.decision, by=cur.resolved_by,
                        note=cur.note, human_actions=len(captured))
         return cur
@@ -251,7 +271,7 @@ class SimulatedOperator:
         self.name = name
         self._handled: set[str] = set()
 
-    def tick(self, req: InterventionRequest, store: HandoffStore, surface: Any) -> None:
+    def tick(self, req: InterventionRequest, store: Store, surface: Any) -> None:
         if req.id in self._handled or req.status == "resolved":
             return
         self._handled.add(req.id)
@@ -270,7 +290,7 @@ class SimulatedOperator:
             else:  # find the control the way a person would: by its visible caption
                 from cua.schema import Target
 
-                loc = surface._loc(surface.resolve(Target(frame=a.get("frame", "main"), role=a["role"], name=a["name"]), {}))
+                loc = surface._loc(surface.resolve(Target(frame=a.get("frame", "main"), role=a["role"], name=a["name"], nth=0), {}))
             if a["type"] == "fill":
                 loc.click()
                 loc.press_sequentially(a["value"], delay=20)

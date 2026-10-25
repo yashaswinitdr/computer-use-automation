@@ -1,0 +1,26 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          pip install -e ".[dev]"
+          python -m playwright install --with-deps chromium
+      - name: Lint
+        run: ruff check .
+      - name: Type-check service modules
+        run: mypy cua/api.py cua/service.py cua/db.py cua/handoff_db.py cua/handoff.py cua/policy.py cua/redact.py --follow-imports=silent
+      - name: Tests (unit, end-to-end browser, API)
+        run: pytest -q

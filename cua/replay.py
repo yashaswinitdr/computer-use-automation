@@ -29,9 +29,29 @@ from cua.evidence import RunLog
 from cua.handoff import Controller
 from cua.policy import Policy
 from cua.schema import (
-    AppProfile, BusinessOutcome, Capability, Checkpoint, Click, DriftRecord, Extract, Failure, Fill, KnownState,
-    Navigate, OutputSpec, ParamValue, Press, RecoveryRecord, ReplayResult, Select, Sensitivity, StateView, Step,
-    SecretValue, TenantConfig, ValueExpr,
+    AppProfile,
+    BusinessOutcome,
+    Capability,
+    Checkpoint,
+    Click,
+    DriftRecord,
+    Extract,
+    Failure,
+    Fill,
+    KnownState,
+    Navigate,
+    OutputSpec,
+    ParamValue,
+    Press,
+    RecoveryRecord,
+    ReplayResult,
+    SecretValue,
+    Select,
+    Sensitivity,
+    StateView,
+    Step,
+    TenantConfig,
+    ValueExpr,
 )
 from cua.surface.base import Observation, TargetError
 from cua.surface.web import render_pattern
@@ -241,7 +261,7 @@ class Replayer:
                 return r
             except TargetError as e:
                 if e.code == "target_ambiguous":
-                    raise _Fail(self._failure("target_ambiguous", str(e), step, expected=target.describe()))
+                    raise _Fail(self._failure("target_ambiguous", str(e), step, expected=target.describe())) from None
                 last = e
             obs = self.s.observe(with_elements=False)
             ks = self._match_known(obs)

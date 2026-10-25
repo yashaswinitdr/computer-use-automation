@@ -9,8 +9,9 @@ implement the same protocol -- see REPORT.md section 4.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable, Protocol
+from typing import Any, Protocol
 
 from cua.schema import Condition, ExtractionSource, Target
 

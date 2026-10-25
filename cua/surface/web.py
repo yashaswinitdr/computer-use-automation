@@ -11,11 +11,12 @@ from __future__ import annotations
 import fnmatch
 import json
 import re
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 from urllib.parse import urlsplit
 
-from playwright.sync_api import Frame, Page, sync_playwright
 from playwright.sync_api import Error as PWError
+from playwright.sync_api import Frame, Page, sync_playwright
 
 from cua.policy import Policy
 from cua.schema import Condition, ElementCond, LabeledValue, RouteCond, TableCell, Target, TextCond, TextRegex, TitleCond
