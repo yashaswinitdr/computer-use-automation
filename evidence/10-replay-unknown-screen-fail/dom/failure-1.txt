@@ -1,0 +1,28 @@
+=== frame (top)  path=/  title='CoreTeller'
+
+
+=== frame nav  path=/nav  title='MENU'
+Home	|	Member Inquiry	|	Sign Off
+
+=== frame main  path=/inq  title='TELLER SURVEY'
+FIRST COMMUNITY CU  -  CORETELLER 4.2	10/24/2026
+
+QUICK TELLER SURVEY
+
+HOW SATISFIED ARE YOU WITH CORETELLER 4.2?
+
+
+VERY SATISFIED
+SATISFIED
+NOT SATISFIED
+
+
+
+
+=== controls
+nav: link 'Home' nth=0 css=body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(1) > a:nth-of-type(1)
+nav: link 'Member Inquiry' nth=0 css=body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > a:nth-of-type(1)
+nav: link 'Sign Off' nth=0 css=body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(5) > a:nth-of-type(1)
+main: combobox '' nth=0 css=select[name="s"]
+main: button 'Submit Survey' nth=0 css=input[type="submit"][value="Submit Survey"]
+main: button 'Remind Me Later' nth=0 css=input[type="submit"][value="Remind Me Later"]

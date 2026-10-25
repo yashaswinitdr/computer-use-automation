@@ -1,0 +1,46 @@
+{
+  "status": "failed",
+  "capability": "coreteller.member.savings_balance@1.0.0",
+  "run_id": "replay-20261024-231840-48b8",
+  "tenant_id": "fccu",
+  "outputs": {},
+  "outcome": null,
+  "failure": {
+    "code": "checkpoint_timeout",
+    "message": "postcondition not met within 10000ms; screen matches no known state",
+    "step_id": "s1",
+    "step_intent": "Activate link \"Member Inquiry\"",
+    "expected": "{\"kind\":\"route\",\"frame\":\"main\",\"pattern\":\"/inq\"} AND {\"kind\":\"title\",\"frame\":\"main\",\"equals\":\"MEMBER INQUIRY\"}",
+    "observed": {
+      "frames": [
+        {
+          "frame": null,
+          "path": "/",
+          "title": "CoreTeller",
+          "text": ""
+        },
+        {
+          "frame": "nav",
+          "path": "/nav",
+          "title": "MENU",
+          "text": "Home\t|\tMember Inquiry\t|\tSign Off"
+        },
+        {
+          "frame": "main",
+          "path": "/inq",
+          "title": "TELLER SURVEY",
+          "text": "FIRST COMMUNITY CU \u00a0-\u00a0 CORETELLER 4.2\t10/24/2026\n\nQUICK TELLER SURVEY\n\nHOW SATISFIED ARE YOU WITH CORETELLER 4.2?\n\n\nVERY SATISFIED\nSATISFIED\nNOT SATISFIED\n\n\n"
+        }
+      ]
+    },
+    "evidence": {
+      "screenshot": "screenshots/failure-1.png",
+      "dom": "dom/failure-1.txt"
+    }
+  },
+  "recoveries": [],
+  "drift": [],
+  "interventions": [],
+  "steps_completed": 0,
+  "duration_ms": 10672
+}

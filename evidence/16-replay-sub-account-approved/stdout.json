@@ -1,0 +1,17 @@
+{
+  "status": "succeeded",
+  "capability": "coreteller.member.open_sub_account@1.0.0",
+  "run_id": "replay-20261024-232151-ab49",
+  "tenant_id": "fccu",
+  "outputs": {
+    "confirmation_number": "1143CC",
+    "suffix": "20"
+  },
+  "recoveries": [],
+  "drift": [],
+  "interventions": [
+    "req-2b1a8e"
+  ],
+  "steps_completed": 11,
+  "duration_ms": 2359
+}

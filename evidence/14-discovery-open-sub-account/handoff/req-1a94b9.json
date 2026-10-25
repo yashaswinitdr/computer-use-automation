@@ -1,0 +1,55 @@
+{
+  "id": "req-1a94b9",
+  "run_id": "discover-20261024-231911-ad82",
+  "kind": "stuck",
+  "reason": "agent appears stuck: repeating the same action on an unchanged screen",
+  "subject": "Open a new ***UB sub-account named ***ND for member ***77 with an initial deposit of 50.00, and return the confirmation number and the new suffix",
+  "step_id": "discovery-4",
+  "step_intent": null,
+  "proposed_action": null,
+  "state": [
+    {
+      "frame": null,
+      "path": "/",
+      "title": "CoreTeller",
+      "text": ""
+    },
+    {
+      "frame": "nav",
+      "path": "/nav",
+      "title": "MENU",
+      "text": "Home\t|\tMember Inquiry\t|\tSign Off"
+    },
+    {
+      "frame": "main",
+      "path": "/home",
+      "title": "MAIN MENU",
+      "text": "FIRST COMMUNITY CU  -  CORETELLER 4.2\t10/24/2026\n\nWELCOME, [SECRET].\n\nSELECT A FUNCTION FROM THE MENU ABOVE."
+    }
+  ],
+  "screenshot": "screenshots/req-1a94b9.png",
+  "allowed_decisions": [
+    "resume",
+    "abort"
+  ],
+  "status": "resolved",
+  "created_at": "2026-10-25T03:20:34+00:00",
+  "claimed_by": "sim-operator",
+  "claimed_at": "2026-10-25T03:20:34+00:00",
+  "decision": "resume",
+  "note": "Sub-accounts are opened from the member's summary screen: look the member up via Member Inquiry first.",
+  "resolved_by": "sim-operator",
+  "resolved_at": "2026-10-25T03:20:35+00:00",
+  "human_actions": [
+    {
+      "role": "link",
+      "name": "Member Inquiry",
+      "nth": 0,
+      "frame": "nav",
+      "path": "/nav",
+      "css": "body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > a:nth-of-type(1)",
+      "action": "click",
+      "at": "2026-10-25T03:20:34+00:00"
+    }
+  ]
+}

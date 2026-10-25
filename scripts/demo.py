@@ -37,7 +37,7 @@ def run(label: str, args: list[str], note: str) -> dict:
     fail = out.get("failure") or {}
     rows.append({"dir": label, "note": note, "status": out.get("status"),
                  "detail": (out.get("outcome") or {}).get("code") or fail.get("code") or
-                 ", ".join(f"{k}={v}" for k, v in (out.get("outputs") or {}).items()) or out.get("artifact", ""),
+                 ", ".join(f"{k}={v}" for k, v in (out.get("outputs") or {}).items()) or out.get("artifact") or out.get("reason", ""),
                  "recoveries": ", ".join(r["code"] for r in out.get("recoveries", [])),
                  "interventions": len(out.get("interventions", []))})
     print(json.dumps(out, indent=2)[:1500])
@@ -103,28 +103,33 @@ def main() -> None:
         "agent-facing: invoke approved capability by tool name with JSON args")
 
     # ---- 3. write flow with an irreversible step
-    llm2 = list(llm)
-    if a.provider == "scripted":
-        llm2[-1] = "scripts/scripted/open_sub_account.json"
-    d2 = run("14-discovery-open-sub-account", ["discover", *llm2, "--operator-script", "scripts/operator/approve.json",
-             "--goal", "Open a new {share_type} sub-account named {nickname} for member {member_id} with an initial deposit of "
-                       "{initial_deposit}, and return the confirmation number and the new suffix",
-             "--param", "member_id=20077", "--param", "share_type=HOLIDAY CLUB", "--param", "nickname=XMAS FUND",
-             "--param", "initial_deposit=50.00", "--id", "coreteller.member.open_sub_account",
-             "--title", "Open member sub-account",
-             "--description", "Opens a new share sub-account for an existing member and returns the host confirmation number."],
-             "LLM discovery of a multi-field write flow; the irreversible Confirm is gated by human approval")
+    goal2 = ("Open a new {share_type} sub-account named {nickname} for member {member_id} with an initial deposit of "
+             "{initial_deposit}, and return the confirmation number and the new suffix")
+    p2 = ["--param", "member_id=20077", "--param", "share_type=HOLIDAY CLUB", "--param", "nickname=XMAS FUND",
+          "--param", "initial_deposit=50.00", "--title", "Open member sub-account",
+          "--description", "Opens a new share sub-account for an existing member and returns the host confirmation number."]
+    d2 = run("14-discovery-open-sub-account", ["discover", *llm, "--max-steps", "25", "--operator-script",
+             "scripts/operator/discovery_assist.json", "--goal", goal2, *p2, "--id", "coreteller.member.open_sub_account"],
+             "LLM discovery of a multi-field write flow; when the agent is stuck an operator takes control once, "
+             "then hands back; the irreversible Confirm is gated by human approval")
+    if d2.get("status") != "succeeded":
+        # Honest fallback: record the write flow with the scripted stand-in so its replay paths can be demonstrated.
+        d2 = run("15-recording-open-sub-account-scripted", ["discover", "--provider", "scripted", "--script",
+                 "scripts/scripted/open_sub_account.json", "--operator-script", "scripts/operator/approve.json",
+                 "--goal", goal2, *p2, "--id", "coreteller.member.open_sub_account"],
+                 "NOT an LLM run: the local model could not finish run 14, so this capability was recorded with the "
+                 "scripted stand-in (provenance.model = scripted) to demonstrate the write-flow replay paths")
     art2 = ROOT / d2["artifact"]
     shutil.copy(art2, OUT / "capability.open_sub_account.json")
     (OUT / "capability.open_sub_account.review.txt").write_text(
         subprocess.run(PY + ["show", str(art2)], cwd=ROOT, capture_output=True, text=True, encoding="utf-8").stdout, encoding="utf-8")
     subprocess.run(PY + ["approve", str(art2), "--reviewer", "demo-reviewer"], cwd=ROOT, check=True)
     sub_args = lambda d: json.dumps({"member_id": "10042", "share_type": "VACATION CLUB", "nickname": "BEACH", "initial_deposit": d})
-    run("15-replay-sub-account-approved", ["replay", str(art2), "--args", sub_args("75.00"), "--operator-script", "scripts/operator/approve.json"],
+    run("16-replay-sub-account-approved", ["replay", str(art2), "--args", sub_args("75.00"), "--operator-script", "scripts/operator/approve.json"],
         "irreversible step -> approval request -> approved -> committed")
-    run("16-replay-sub-account-denied", ["replay", str(art2), "--args", sub_args("75.00"), "--operator-script", "scripts/operator/deny.json"],
+    run("17-replay-sub-account-denied", ["replay", str(art2), "--args", sub_args("75.00"), "--operator-script", "scripts/operator/deny.json"],
         "irreversible step -> approval denied -> stops, nothing committed")
-    run("17-replay-sub-account-host-validation", ["replay", str(art2), "--args", sub_args("9999"), "--no-escalate"],
+    run("18-replay-sub-account-host-validation", ["replay", str(art2), "--args", sub_args("9999"), "--no-escalate"],
         "host validation error (ERR 1102) before the irreversible step -> business outcome invalid_input")
 
     lines = ["# Evidence index", "", "Generated by `python scripts/demo.py`. Each directory is a copy of `runs/<run_id>/`: "

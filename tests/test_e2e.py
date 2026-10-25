@@ -43,6 +43,18 @@ def replay(env, cap, params, operator=None, escalate=False, tenant=None):
     return Replayer(surface, env.profile, t, env.policy, log, ctl, escalate=escalate).run(cap, params), log
 
 
+def test_discovery_logs_mask_pii_inputs(env, faults):
+    log, surface, ctl = env.open("discover")
+    session = Replayer(surface, env.profile, env.tenant, env.policy, log, ctl)
+    params = {"member_id": "10042"}
+    out = Discovery(surface, ScriptedLLM(script("savings_balance")), env.policy, log, ctl, session,
+                    env.profile.pii_labels).run(GOAL.format(**params), params)
+    assert out.status == "succeeded"
+    log.write_json("trace.json", [t.__dict__ for t in out.trace])
+    for f in ("events.jsonl", "trace.json"):
+        assert "10042" not in (log.dir / f).read_text(), f
+
+
 def test_discovery_records_parameterised_artifact(savings_cap):
     assert [s.action.type for s in savings_cap.steps] == ["click", "fill", "click", "extract"]
     assert "10042" not in savings_cap.to_json()

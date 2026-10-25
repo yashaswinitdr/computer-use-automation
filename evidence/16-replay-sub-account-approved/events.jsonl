@@ -1,0 +1,36 @@
+{"seq": 1, "ts": "2026-10-25T03:21:51.776+00:00", "t_ms": 657, "type": "replay_started", "capability": "coreteller.member.open_sub_account@1.0.0", "status": "approved", "tenant": "fccu", "inputs": ["initial_deposit", "member_id", "nickname", "share_type"]}
+{"seq": 2, "ts": "2026-10-25T03:21:51.917+00:00", "t_ms": 797, "type": "flow_started", "flow": "sign_on"}
+{"seq": 3, "ts": "2026-10-25T03:21:51.937+00:00", "t_ms": 827, "type": "step_started", "step": "so1", "intent": "Enter teller user id", "action": "fill", "risk": "write", "target": "main:textbox \"User ID\""}
+{"seq": 4, "ts": "2026-10-25T03:21:51.984+00:00", "t_ms": 875, "type": "step_completed", "step": "so1"}
+{"seq": 5, "ts": "2026-10-25T03:21:51.995+00:00", "t_ms": 875, "type": "step_started", "step": "so2", "intent": "Enter teller password", "action": "fill", "risk": "write", "target": "main:textbox \"Password\""}
+{"seq": 6, "ts": "2026-10-25T03:21:52.018+00:00", "t_ms": 907, "type": "step_completed", "step": "so2"}
+{"seq": 7, "ts": "2026-10-25T03:21:52.034+00:00", "t_ms": 922, "type": "step_started", "step": "so3", "intent": "Submit sign-on", "action": "click", "risk": "read", "target": "main:button \"Sign On\""}
+{"seq": 8, "ts": "2026-10-25T03:21:52.341+00:00", "t_ms": 1234, "type": "step_completed", "step": "so3"}
+{"seq": 9, "ts": "2026-10-25T03:21:52.349+00:00", "t_ms": 1234, "type": "flow_completed", "flow": "sign_on"}
+{"seq": 10, "ts": "2026-10-25T03:21:52.358+00:00", "t_ms": 1250, "type": "step_started", "step": "s1", "intent": "Activate link \"Member Inquiry\"", "action": "click", "risk": "read", "target": "nav:link \"Member Inquiry\""}
+{"seq": 11, "ts": "2026-10-25T03:21:52.633+00:00", "t_ms": 1516, "type": "step_completed", "step": "s1"}
+{"seq": 12, "ts": "2026-10-25T03:21:52.639+00:00", "t_ms": 1532, "type": "step_started", "step": "s2", "intent": "Enter {member_id} into \"Member Number\"", "action": "fill", "risk": "read", "target": "main:textbox \"Member Number\""}
+{"seq": 13, "ts": "2026-10-25T03:21:52.657+00:00", "t_ms": 1547, "type": "step_completed", "step": "s2"}
+{"seq": 14, "ts": "2026-10-25T03:21:52.663+00:00", "t_ms": 1547, "type": "step_started", "step": "s3", "intent": "Activate button \"Search\"", "action": "click", "risk": "read", "target": "main:button \"Search\""}
+{"seq": 15, "ts": "2026-10-25T03:21:52.932+00:00", "t_ms": 1812, "type": "step_completed", "step": "s3"}
+{"seq": 16, "ts": "2026-10-25T03:21:52.936+00:00", "t_ms": 1827, "type": "step_started", "step": "s4", "intent": "Activate link \"Open Sub-Account\"", "action": "click", "risk": "read", "target": "main:link \"Open Sub-Account\""}
+{"seq": 17, "ts": "2026-10-25T03:21:53.198+00:00", "t_ms": 2077, "type": "step_completed", "step": "s4"}
+{"seq": 18, "ts": "2026-10-25T03:21:53.204+00:00", "t_ms": 2094, "type": "step_started", "step": "s5", "intent": "Choose option in \"Share Type\"", "action": "select", "risk": "read", "target": "main:combobox \"Share Type\""}
+{"seq": 19, "ts": "2026-10-25T03:21:53.220+00:00", "t_ms": 2109, "type": "step_completed", "step": "s5"}
+{"seq": 20, "ts": "2026-10-25T03:21:53.227+00:00", "t_ms": 2109, "type": "step_started", "step": "s6", "intent": "Enter {nickname} into \"Nickname\"", "action": "fill", "risk": "read", "target": "main:textbox \"Nickname\""}
+{"seq": 21, "ts": "2026-10-25T03:21:53.235+00:00", "t_ms": 2125, "type": "step_completed", "step": "s6"}
+{"seq": 22, "ts": "2026-10-25T03:21:53.241+00:00", "t_ms": 2125, "type": "step_started", "step": "s7", "intent": "Enter {initial_deposit} into \"Initial Deposit\"", "action": "fill", "risk": "read", "target": "main:textbox \"Initial Deposit\""}
+{"seq": 23, "ts": "2026-10-25T03:21:53.249+00:00", "t_ms": 2141, "type": "step_completed", "step": "s7"}
+{"seq": 24, "ts": "2026-10-25T03:21:53.257+00:00", "t_ms": 2141, "type": "step_started", "step": "s8", "intent": "Activate button \"Continue\"", "action": "click", "risk": "write", "target": "main:button \"Continue\""}
+{"seq": 25, "ts": "2026-10-25T03:21:53.529+00:00", "t_ms": 2422, "type": "step_completed", "step": "s8"}
+{"seq": 26, "ts": "2026-10-25T03:21:53.534+00:00", "t_ms": 2422, "type": "step_started", "step": "s9", "intent": "Activate button \"Confirm\"", "action": "click", "risk": "irreversible", "target": "main:button \"Confirm\""}
+{"seq": 27, "ts": "2026-10-25T03:21:53.592+00:00", "t_ms": 2484, "type": "intervention_requested", "request": "req-2b1a8e", "kind": "approval", "reason": "Step 'Activate button \"Confirm\"' is irreversible. Approve to let automation perform it, deny to stop, or take control, perform it yourself, and resume.", "step": "s9", "allowed": ["approve", "deny", "resume"], "screenshot": "screenshots/req-2b1a8e.png"}
+{"seq": 28, "ts": "2026-10-25T03:21:53.862+00:00", "t_ms": 2750, "type": "intervention_resolved", "request": "req-2b1a8e", "decision": "approve", "by": "sim-operator", "note": "Reviewed amount and member; OK to commit.", "human_actions": 0}
+{"seq": 29, "ts": "2026-10-25T03:21:54.107+00:00", "t_ms": 3000, "type": "step_completed", "step": "s9"}
+{"seq": 30, "ts": "2026-10-25T03:21:54.113+00:00", "t_ms": 3000, "type": "step_started", "step": "s10", "intent": "Read output 'confirmation_number'", "action": "extract", "risk": "read", "target": null}
+{"seq": 31, "ts": "2026-10-25T03:21:54.115+00:00", "t_ms": 3000, "type": "output_extracted", "step": "s10", "output": "confirmation_number", "value": "1143CC"}
+{"seq": 32, "ts": "2026-10-25T03:21:54.115+00:00", "t_ms": 3000, "type": "step_completed", "step": "s10"}
+{"seq": 33, "ts": "2026-10-25T03:21:54.119+00:00", "t_ms": 3000, "type": "step_started", "step": "s11", "intent": "Read output 'suffix'", "action": "extract", "risk": "read", "target": null}
+{"seq": 34, "ts": "2026-10-25T03:21:54.120+00:00", "t_ms": 3000, "type": "output_extracted", "step": "s11", "output": "suffix", "value": "20"}
+{"seq": 35, "ts": "2026-10-25T03:21:54.121+00:00", "t_ms": 3000, "type": "step_completed", "step": "s11"}
+{"seq": 36, "ts": "2026-10-25T03:21:54.125+00:00", "t_ms": 3016, "type": "replay_succeeded", "outputs": {"confirmation_number": "1143CC", "suffix": "20"}}

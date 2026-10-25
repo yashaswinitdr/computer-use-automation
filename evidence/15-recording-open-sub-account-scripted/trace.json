@@ -1,0 +1,419 @@
+[
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "nav",
+    "role": "link",
+    "name": "Member Inquiry",
+    "nth": 0,
+    "css": "body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > a:nth-of-type(1)",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/home",
+        "MAIN MENU"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "fill",
+    "frame": "main",
+    "role": "textbox",
+    "name": "Member Number",
+    "nth": 0,
+    "css": "input[name=\"q\"]",
+    "text": "***77",
+    "param": "member_id",
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "main",
+    "role": "button",
+    "name": "Search",
+    "nth": 0,
+    "css": "input[type=\"button\"][value=\"Search\"]",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/mbr/***77",
+        "MEMBER SUMMARY"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "main",
+    "role": "link",
+    "name": "Open Sub-Account",
+    "nth": 0,
+    "css": "body > a:nth-of-type(1)",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/mbr/***77",
+        "MEMBER SUMMARY"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "select",
+    "frame": "main",
+    "role": "combobox",
+    "name": "Share Type",
+    "nth": 0,
+    "css": "select[name=\"x1\"]",
+    "text": "***UB",
+    "param": "share_type",
+    "key": null,
+    "options": [
+      "SAVINGS",
+      "***UB",
+      "VACATION CLUB",
+      "MONEY MARKET"
+    ],
+    "risk": "read",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "fill",
+    "frame": "main",
+    "role": "textbox",
+    "name": "Nickname",
+    "nth": 0,
+    "css": "input[name=\"x2\"]",
+    "text": "***ND",
+    "param": "nickname",
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "fill",
+    "frame": "main",
+    "role": "textbox",
+    "name": "Initial Deposit",
+    "nth": 0,
+    "css": "input[name=\"x9\"]",
+    "text": "50.00",
+    "param": "initial_deposit",
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "main",
+    "role": "button",
+    "name": "Continue",
+    "nth": 0,
+    "css": "input[type=\"submit\"][value=\"Continue\"]",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "write",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/new",
+        "OPEN SUB-ACCOUNT"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/review",
+        "REVIEW SUB-ACCOUNT"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "main",
+    "role": "button",
+    "name": "Confirm",
+    "nth": 0,
+    "css": "input[type=\"submit\"][value=\"Confirm\"]",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "irreversible",
+    "extract": null,
+    "rationale": "scripted",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/review",
+        "REVIEW SUB-ACCOUNT"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/sub/confirm",
+        "SUB-ACCOUNT OPENED"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "extract",
+    "frame": null,
+    "role": null,
+    "name": null,
+    "nth": 0,
+    "css": null,
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": {
+      "output": "confirmation_number",
+      "source": {
+        "kind": "labeled_value",
+        "frame": "main",
+        "label": "Confirmation #"
+      },
+      "row_key_param": null
+    },
+    "rationale": "scripted",
+    "before": [],
+    "after": []
+  },
+  {
+    "source": "model",
+    "action": "extract",
+    "frame": null,
+    "role": null,
+    "name": null,
+    "nth": 0,
+    "css": null,
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": {
+      "output": "suffix",
+      "source": {
+        "kind": "labeled_value",
+        "frame": "main",
+        "label": "Suffix"
+      },
+      "row_key_param": null
+    },
+    "rationale": "scripted",
+    "before": [],
+    "after": []
+  }
+]

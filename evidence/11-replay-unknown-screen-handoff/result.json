@@ -1,0 +1,18 @@
+{
+  "status": "succeeded",
+  "capability": "coreteller.member.savings_balance@1.0.0",
+  "run_id": "replay-20261024-231852-ad98",
+  "tenant_id": "fccu",
+  "outputs": {
+    "share_savings_balance": "1234.56"
+  },
+  "outcome": null,
+  "failure": null,
+  "recoveries": [],
+  "drift": [],
+  "interventions": [
+    "req-c90943"
+  ],
+  "steps_completed": 4,
+  "duration_ms": 13015
+}

@@ -1,0 +1,25 @@
+=== frame (top)  path=/  title='CoreTeller'
+
+
+=== frame nav  path=/nav  title='MENU'
+Home	|	Member Inquiry	|	Sign Off
+
+=== frame main  path=/sub/review  title='REVIEW SUB-ACCOUNT'
+FIRST COMMUNITY CU  -  CORETELLER 4.2	10/24/2026
+
+PLEASE REVIEW. THIS ACTION CANNOT BE UNDONE.
+
+
+Member:	***42
+Share Type:	VACATION CLUB
+Nickname:	***CH
+Initial Deposit:	$75.00
+
+
+
+=== controls
+nav: link 'Home' nth=0 css=body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(1) > a:nth-of-type(1)
+nav: link 'Member Inquiry' nth=0 css=body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > a:nth-of-type(1)
+nav: link 'Sign Off' nth=0 css=body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(5) > a:nth-of-type(1)
+main: button 'Confirm' nth=0 css=input[type="submit"][value="Confirm"]
+main: button 'Cancel' nth=0 css=input[type="submit"][value="Cancel"]

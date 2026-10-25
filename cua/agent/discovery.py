@@ -33,8 +33,8 @@ Your successful run is converted into a deterministic, replayable automation, so
 - Read HISTORY before acting: never repeat an action that already succeeded. Each turn, look at what the
   CURRENT screen offers (its fields and buttons) and take the next step on it.
 - Navigate with the application's own menus and links (there is no URL tool).
-- When you type or select a value that is one of the PARAMETERS, pass the parameter name in `param`, so it is
-  recorded as an input rather than a constant.
+- To type or select a PARAMETER, set `text`/`option` to `{parameter_name}` (e.g. `{member_id}`) or to its value,
+  and pass the parameter name in `param`, so it is recorded as an input rather than a constant.
 - Declare each piece of data the goal asks you to read with `extract`, choosing the most stable source:
   `labeled_value` for "Caption: value" pairs, `table_cell` for tables (identify the row by the value of a key
   column, never by position), `text_regex` only as a last resort. Use snake_case output names.
@@ -50,23 +50,24 @@ Safety rules:
 Controls are referenced by `ref` (e.g. e2_3), valid only for the current observation."""
 
 _RATIONALE = {"type": "string", "description": "One sentence: why this action moves toward the goal"}
+_NAME = {"type": "string", "description": "The control's name exactly as listed next to its ref (grounding check)"}
 TOOLS: list[dict[str, Any]] = [
     {"name": "click", "description": "Click a link or button.",
-     "parameters": {"type": "object", "properties": {"ref": {"type": "string"}, "rationale": _RATIONALE},
-                    "required": ["ref", "rationale"], "additionalProperties": False}},
+     "parameters": {"type": "object", "properties": {"ref": {"type": "string"}, "name": _NAME, "rationale": _RATIONALE},
+                    "required": ["ref", "name", "rationale"], "additionalProperties": False}},
     {"name": "fill", "description": "Replace the text in a textbox.",
      "parameters": {"type": "object", "properties": {
-         "ref": {"type": "string"}, "text": {"type": "string"},
+         "ref": {"type": "string"}, "name": _NAME, "text": {"type": "string"},
          "param": {"type": "string", "description": "Name of the PARAMETER this text comes from, if any"},
-         "rationale": _RATIONALE}, "required": ["ref", "text", "rationale"], "additionalProperties": False}},
+         "rationale": _RATIONALE}, "required": ["ref", "name", "text", "rationale"], "additionalProperties": False}},
     {"name": "select", "description": "Choose an option (by its visible label) in a dropdown.",
      "parameters": {"type": "object", "properties": {
-         "ref": {"type": "string"}, "option": {"type": "string"},
+         "ref": {"type": "string"}, "name": _NAME, "option": {"type": "string"},
          "param": {"type": "string", "description": "Name of the PARAMETER this option comes from, if any"},
-         "rationale": _RATIONALE}, "required": ["ref", "option", "rationale"], "additionalProperties": False}},
+         "rationale": _RATIONALE}, "required": ["ref", "name", "option", "rationale"], "additionalProperties": False}},
     {"name": "press", "description": "Press a key (e.g. Enter) while a control is focused.",
-     "parameters": {"type": "object", "properties": {"ref": {"type": "string"}, "key": {"type": "string"}, "rationale": _RATIONALE},
-                    "required": ["ref", "key", "rationale"], "additionalProperties": False}},
+     "parameters": {"type": "object", "properties": {"ref": {"type": "string"}, "name": _NAME, "key": {"type": "string"}, "rationale": _RATIONALE},
+                    "required": ["ref", "name", "key", "rationale"], "additionalProperties": False}},
     {"name": "extract", "description": "Declare and read one output value from the current screen.",
      "parameters": {"type": "object", "properties": {
          "output": {"type": "string", "description": "snake_case output name"},
@@ -201,6 +202,12 @@ class Discovery:
 
     # ------------------------------------------------------------------ main loop
     def run(self, goal: str, params: dict[str, str]) -> DiscoveryOutcome:
+        from cua.recorder import infer_param_spec  # lazy: recorder imports this module
+
+        # Mask example inputs in this run's logs/evidence with the same sensitivity the artifact will declare.
+        for name, value in params.items():
+            if infer_param_spec(name, value).sensitivity.value in ("pii", "secret"):
+                self.log.redactor.add_pii(value)
         self.s.open("/")
         self.session.settle()
         self.session.ensure_session()
@@ -258,10 +265,14 @@ class Discovery:
 
             if call.name == "finish":
                 st = args.get("success_text", "")
-                visible = any(st.lower() in f.text.lower() for f in obs.frames) if st else True
-                if not visible:
+                if st and not any(st.lower() in f.text.lower() for f in obs.frames):
+                    # Recording text that is not on screen would create a checkpoint replay can never meet.
+                    # Drop it; the final route/title and the extracted outputs still verify success.
+                    self.log.event("success_text_discarded", step=step, text=st, reason="not visible on final screen")
+                    st = ""
+                if not st and not outputs and len(trace) == 0:
                     errors += 1
-                    history.append(f"{step}. finish REJECTED: success_text {st!r} is not visible on the screen")
+                    history.append(f"{step}. finish REJECTED: nothing has been done yet")
                     continue
                 self.log.event("discovery_succeeded", steps=step, summary=args.get("summary"), outputs=sorted(outputs))
                 return DiscoveryOutcome("succeeded", args.get("summary", ""), trace, outputs, specs, st or None,
@@ -282,7 +293,10 @@ class Discovery:
                 continue
 
             errors += 1
-            history.append(f"{step}. ERROR: no valid tool call ({call.text or call.name})")
+            said = " ".join((call.text or "").split())[:200]
+            self.log.event("no_tool_call", step=step, text=said)
+            history.append(f"{step}. ERROR: you replied with text ({said!r}) instead of calling a tool. Every turn "
+                           "must call exactly one tool. If the goal is achieved and outputs are extracted, call finish.")
 
     # ------------------------------------------------------------------ actions
     def _do_ui(self, tool: str, args: dict[str, Any], obs: Observation, params: dict[str, str],
@@ -290,6 +304,16 @@ class Discovery:
         el: UIElement | None = next((e for e in obs.elements if e.ref == args.get("ref")), None)
         if el is None:
             return f"ERROR: unknown ref {args.get('ref')!r}; use a ref from the current observation"
+        def key(n: str) -> str:  # formatting-insensitive: "Member Number" == "member_number" == "MEMBER NUMBER:"
+            return "".join(ch for ch in n.lower() if ch.isalnum())
+
+        meant = key(str(args.get("name") or ""))
+        if meant == key(el.ref):
+            meant = ""  # the model echoed the ref itself: nothing to cross-check
+        if meant and meant != key(el.name):
+            hits = [e.ref for e in obs.elements if key(e.name) == meant]
+            hint = f"; the control named {args.get('name')!r} is {', '.join(hits)}" if hits else ""
+            return f"ERROR: ref {el.ref} is {el.role} {el.name!r}, not {args.get('name')!r}{hint}. Nothing was done."
         desc = f'{tool} {el.role} "{el.name}" [{el.frame}]'
         ok, why = self.policy.action_allowed(tool)
         if not ok:
@@ -305,6 +329,10 @@ class Discovery:
         param = args.get("param")
         if param and param not in params:
             param = None
+        # Symbolic parameter reference: "{member_id}" (or the bare name) means "the value of that parameter".
+        ref_name = (text or "").strip().strip("{}").strip()
+        if text is not None and ref_name in params and text.strip() in (ref_name, "{" + ref_name + "}"):
+            param, text = ref_name, params[ref_name]
         if param and text != params[param]:
             return f"ERROR: text does not equal the value of parameter {param}"
         entry = TraceEntry(source="model", action=tool, frame=el.frame, role=el.role, name=el.name, nth=el.nth,
@@ -372,8 +400,11 @@ class Discovery:
         raw = self.s.extract(source, row_key, {})
         if not raw:
             return "ERROR: nothing found with that source; check frame, captions and headers"
+        sensitivity = args.get("sensitivity", "internal")
+        if kind == "labeled_value" and src.get("label", "").strip(" :").lower() in {l.lower() for l in self.pii_labels}:
+            sensitivity = "pii"  # policy, not the model, decides: values under the profile's PII captions are PII
         spec = OutputSpec(type=args.get("type", "string"), description=args.get("description", ""),
-                          sensitivity=args.get("sensitivity", "internal"))
+                          sensitivity=sensitivity)
         try:
             val = coerce_output(spec, raw)
         except ValueError as e:

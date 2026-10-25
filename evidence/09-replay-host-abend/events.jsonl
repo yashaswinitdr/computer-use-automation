@@ -1,0 +1,16 @@
+{"seq": 1, "ts": "2026-10-25T03:18:38.214+00:00", "t_ms": 641, "type": "replay_started", "capability": "coreteller.member.savings_balance@1.0.0", "status": "approved", "tenant": "fccu", "inputs": ["member_id"]}
+{"seq": 2, "ts": "2026-10-25T03:18:38.333+00:00", "t_ms": 766, "type": "flow_started", "flow": "sign_on"}
+{"seq": 3, "ts": "2026-10-25T03:18:38.362+00:00", "t_ms": 797, "type": "step_started", "step": "so1", "intent": "Enter teller user id", "action": "fill", "risk": "write", "target": "main:textbox \"User ID\""}
+{"seq": 4, "ts": "2026-10-25T03:18:38.405+00:00", "t_ms": 844, "type": "step_completed", "step": "so1"}
+{"seq": 5, "ts": "2026-10-25T03:18:38.417+00:00", "t_ms": 844, "type": "step_started", "step": "so2", "intent": "Enter teller password", "action": "fill", "risk": "write", "target": "main:textbox \"Password\""}
+{"seq": 6, "ts": "2026-10-25T03:18:38.435+00:00", "t_ms": 875, "type": "step_completed", "step": "so2"}
+{"seq": 7, "ts": "2026-10-25T03:18:38.450+00:00", "t_ms": 891, "type": "step_started", "step": "so3", "intent": "Submit sign-on", "action": "click", "risk": "read", "target": "main:button \"Sign On\""}
+{"seq": 8, "ts": "2026-10-25T03:18:38.754+00:00", "t_ms": 1188, "type": "step_completed", "step": "so3"}
+{"seq": 9, "ts": "2026-10-25T03:18:38.761+00:00", "t_ms": 1188, "type": "flow_completed", "flow": "sign_on"}
+{"seq": 10, "ts": "2026-10-25T03:18:38.768+00:00", "t_ms": 1204, "type": "step_started", "step": "s1", "intent": "Activate link \"Member Inquiry\"", "action": "click", "risk": "read", "target": "nav:link \"Member Inquiry\""}
+{"seq": 11, "ts": "2026-10-25T03:18:39.034+00:00", "t_ms": 1469, "type": "step_completed", "step": "s1"}
+{"seq": 12, "ts": "2026-10-25T03:18:39.038+00:00", "t_ms": 1469, "type": "step_started", "step": "s2", "intent": "Enter {member_id} into \"Member Number\"", "action": "fill", "risk": "read", "target": "main:textbox \"Member Number\""}
+{"seq": 13, "ts": "2026-10-25T03:18:39.052+00:00", "t_ms": 1484, "type": "step_completed", "step": "s2"}
+{"seq": 14, "ts": "2026-10-25T03:18:39.057+00:00", "t_ms": 1484, "type": "step_started", "step": "s3", "intent": "Activate button \"Search\"", "action": "click", "risk": "read", "target": "main:button \"Search\""}
+{"seq": 15, "ts": "2026-10-25T03:18:39.315+00:00", "t_ms": 1750, "type": "known_state_detected", "code": "host_abend", "classification": "hard_failure", "step": "s3"}
+{"seq": 16, "ts": "2026-10-25T03:18:39.358+00:00", "t_ms": 1797, "type": "replay_failed", "code": "host_error", "message": "host_abend: ABEND S0C7 - TRANSACTION TERMINATED. CONTACT HELP DESK. REF 5DA382", "step_id": "s3", "step_intent": "Activate button \"Search\"", "observed": {"frames": [{"frame": null, "path": "/", "title": "CoreTeller", "text": ""}, {"frame": "nav", "path": "/nav", "title": "MENU", "text": "Home\t|\tMember Inquiry\t|\tSign Off"}, {"frame": "main", "path": "/inq", "title": "SYSTEM ERROR", "text": "FIRST COMMUNITY CU \u00a0-\u00a0 CORETELLER 4.2\t10/24/2026\n\nABEND S0C7 - TRANSACTION TERMINATED. CONTACT HELP DESK. REF 5DA382\n\n"}]}, "evidence": {"screenshot": "screenshots/failure-1.png", "dom": "dom/failure-1.txt"}}

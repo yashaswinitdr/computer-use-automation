@@ -1,0 +1,26 @@
+{"seq": 1, "ts": "2026-10-25T03:21:59.196+00:00", "t_ms": 625, "type": "replay_started", "capability": "coreteller.member.open_sub_account@1.0.0", "status": "approved", "tenant": "fccu", "inputs": ["initial_deposit", "member_id", "nickname", "share_type"]}
+{"seq": 2, "ts": "2026-10-25T03:21:59.337+00:00", "t_ms": 766, "type": "flow_started", "flow": "sign_on"}
+{"seq": 3, "ts": "2026-10-25T03:21:59.357+00:00", "t_ms": 797, "type": "step_started", "step": "so1", "intent": "Enter teller user id", "action": "fill", "risk": "write", "target": "main:textbox \"User ID\""}
+{"seq": 4, "ts": "2026-10-25T03:21:59.404+00:00", "t_ms": 844, "type": "step_completed", "step": "so1"}
+{"seq": 5, "ts": "2026-10-25T03:21:59.415+00:00", "t_ms": 844, "type": "step_started", "step": "so2", "intent": "Enter teller password", "action": "fill", "risk": "write", "target": "main:textbox \"Password\""}
+{"seq": 6, "ts": "2026-10-25T03:21:59.442+00:00", "t_ms": 875, "type": "step_completed", "step": "so2"}
+{"seq": 7, "ts": "2026-10-25T03:21:59.454+00:00", "t_ms": 891, "type": "step_started", "step": "so3", "intent": "Submit sign-on", "action": "click", "risk": "read", "target": "main:button \"Sign On\""}
+{"seq": 8, "ts": "2026-10-25T03:21:59.758+00:00", "t_ms": 1188, "type": "step_completed", "step": "so3"}
+{"seq": 9, "ts": "2026-10-25T03:21:59.764+00:00", "t_ms": 1204, "type": "flow_completed", "flow": "sign_on"}
+{"seq": 10, "ts": "2026-10-25T03:21:59.771+00:00", "t_ms": 1204, "type": "step_started", "step": "s1", "intent": "Activate link \"Member Inquiry\"", "action": "click", "risk": "read", "target": "nav:link \"Member Inquiry\""}
+{"seq": 11, "ts": "2026-10-25T03:22:00.054+00:00", "t_ms": 1484, "type": "step_completed", "step": "s1"}
+{"seq": 12, "ts": "2026-10-25T03:22:00.060+00:00", "t_ms": 1500, "type": "step_started", "step": "s2", "intent": "Enter {member_id} into \"Member Number\"", "action": "fill", "risk": "read", "target": "main:textbox \"Member Number\""}
+{"seq": 13, "ts": "2026-10-25T03:22:00.077+00:00", "t_ms": 1516, "type": "step_completed", "step": "s2"}
+{"seq": 14, "ts": "2026-10-25T03:22:00.084+00:00", "t_ms": 1516, "type": "step_started", "step": "s3", "intent": "Activate button \"Search\"", "action": "click", "risk": "read", "target": "main:button \"Search\""}
+{"seq": 15, "ts": "2026-10-25T03:22:00.362+00:00", "t_ms": 1797, "type": "step_completed", "step": "s3"}
+{"seq": 16, "ts": "2026-10-25T03:22:00.367+00:00", "t_ms": 1797, "type": "step_started", "step": "s4", "intent": "Activate link \"Open Sub-Account\"", "action": "click", "risk": "read", "target": "main:link \"Open Sub-Account\""}
+{"seq": 17, "ts": "2026-10-25T03:22:00.627+00:00", "t_ms": 2063, "type": "step_completed", "step": "s4"}
+{"seq": 18, "ts": "2026-10-25T03:22:00.633+00:00", "t_ms": 2063, "type": "step_started", "step": "s5", "intent": "Choose option in \"Share Type\"", "action": "select", "risk": "read", "target": "main:combobox \"Share Type\""}
+{"seq": 19, "ts": "2026-10-25T03:22:00.650+00:00", "t_ms": 2079, "type": "step_completed", "step": "s5"}
+{"seq": 20, "ts": "2026-10-25T03:22:00.655+00:00", "t_ms": 2094, "type": "step_started", "step": "s6", "intent": "Enter {nickname} into \"Nickname\"", "action": "fill", "risk": "read", "target": "main:textbox \"Nickname\""}
+{"seq": 21, "ts": "2026-10-25T03:22:00.661+00:00", "t_ms": 2094, "type": "step_completed", "step": "s6"}
+{"seq": 22, "ts": "2026-10-25T03:22:00.667+00:00", "t_ms": 2094, "type": "step_started", "step": "s7", "intent": "Enter {initial_deposit} into \"Initial Deposit\"", "action": "fill", "risk": "read", "target": "main:textbox \"Initial Deposit\""}
+{"seq": 23, "ts": "2026-10-25T03:22:00.675+00:00", "t_ms": 2109, "type": "step_completed", "step": "s7"}
+{"seq": 24, "ts": "2026-10-25T03:22:00.681+00:00", "t_ms": 2109, "type": "step_started", "step": "s8", "intent": "Activate button \"Continue\"", "action": "click", "risk": "write", "target": "main:button \"Continue\""}
+{"seq": 25, "ts": "2026-10-25T03:22:00.937+00:00", "t_ms": 2375, "type": "known_state_detected", "code": "invalid_input", "classification": "business", "step": "s8"}
+{"seq": 26, "ts": "2026-10-25T03:22:00.938+00:00", "t_ms": 2375, "type": "business_outcome", "code": "invalid_input", "message": "ERR 1102: INVALID DEPOSIT AMOUNT (0.00 - 5,000.00)", "step": "s8"}

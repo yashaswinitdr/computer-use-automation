@@ -47,9 +47,16 @@ python -m playwright install chromium
 cp .env.example .env
 ```
 
-Put **one** LLM key in `.env`: `ANTHROPIC_API_KEY` (default provider, model `claude-opus-5`) or `OPENAI_API_KEY`
-(model `gpt-4.1`). Override the choice with `CUA_PROVIDER` / `CUA_MODEL`. Only discovery uses the key. Replay and
-all tests run without any live service. The teller credentials in `.env.example` are test values for the local
+Discovery needs an LLM. Pick one:
+
+- **Local, no API key (used for the evidence in this repo):** install [Ollama](https://ollama.com), then run
+  `ollama pull qwen2.5:7b` and pass `--provider ollama --model qwen2.5:7b`. Screen data never leaves the machine.
+  Set `OLLAMA_HOST` if the server isn't on the default `http://127.0.0.1:11434`.
+- **Hosted:** put `ANTHROPIC_API_KEY` (default provider, model `claude-opus-5`) or `OPENAI_API_KEY` (model
+  `gpt-4.1`) in `.env`.
+
+Override the choice with `--provider`/`--model` or `CUA_PROVIDER`/`CUA_MODEL`. Only discovery uses a model. Replay
+and all tests run without any live service. The teller credentials in `.env.example` are test values for the local
 synthetic app (see `target_app/seed.py`).
 
 Start the target app. Tenant A is on :5055. Tenant B runs "the same product, configured differently" on :5057.
@@ -67,7 +74,7 @@ python -m cua app --variant b --port 5057
 **1. Discover** (real LLM run). This records `capabilities/coreteller.member.savings_balance@1.0.0.json`.
 
 ```bash
-python -m cua discover --goal "Look up member {member_id} and read their current share savings balance" --param member_id=10042 --id coreteller.member.savings_balance --headed
+python -m cua discover --provider ollama --model qwen2.5:7b --goal "Look up member {member_id} and read their current share savings balance" --param member_id=10042 --id coreteller.member.savings_balance --headed
 ```
 
 **2. Review and approve.** New artifacts are `draft`, and unattended replay requires `approved`.
@@ -146,13 +153,21 @@ python -m pytest -q
 
 ## What is real and what is mocked
 
-- **Real:** the LLM discovery run, browser automation, artifact recording, replay, policy enforcement (including the
-  network-level allowlist), redaction, the handoff state machine and live-session takeover, human-action capture,
-  and the operator console.
+- **Real:** the LLM discovery runs, browser automation, artifact recording, replay, policy enforcement (including
+  the network-level allowlist), redaction, the handoff state machine and live-session takeover, human-action
+  capture, and the operator console.
+- **The two discovery runs in `evidence/`** were driven by Qwen 2.5 7B running locally under Ollama:
+  - **Savings balance (`01`):** completed autonomously. Every step was a model decision, and the capability that
+    every later replay uses was recorded from this run.
+  - **Open sub-account (`14`):** this longer multi-field flow was beyond the small local model. It got stuck, a
+    human operator took control once and handed back, and it got stuck again. The run is kept as evidence of stuck
+    detection and handoff during discovery. So that the write-flow replay paths (approval, denial, host validation)
+    can still be shown, that capability was recorded with the scripted stand-in (`15`) and is labelled as such,
+    including `provenance.model = "scripted"`. A stronger hosted model should be used to re-record it.
 - **Mocked, deliberately:**
   - The target is a local synthetic app, because we must not touch a real bank system.
   - `SimulatedOperator` stands in for a person in demos and tests. It acts through real input events on the live
     page, so capture is exercised for real.
-  - `ScriptedLLM` replaces the model in tests only.
+  - `ScriptedLLM` replaces the model in tests, and in recording `15` as described above.
 - **Designed but not built:** desktop/UIA and pixel-only surfaces, streamed co-browsing console, multi-tenant
   registry service. See REPORT.md §4 and §7.

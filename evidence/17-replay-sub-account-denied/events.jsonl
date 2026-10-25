@@ -1,0 +1,29 @@
+{"seq": 1, "ts": "2026-10-25T03:21:55.573+00:00", "t_ms": 655, "type": "replay_started", "capability": "coreteller.member.open_sub_account@1.0.0", "status": "approved", "tenant": "fccu", "inputs": ["initial_deposit", "member_id", "nickname", "share_type"]}
+{"seq": 2, "ts": "2026-10-25T03:21:55.718+00:00", "t_ms": 812, "type": "flow_started", "flow": "sign_on"}
+{"seq": 3, "ts": "2026-10-25T03:21:55.741+00:00", "t_ms": 827, "type": "step_started", "step": "so1", "intent": "Enter teller user id", "action": "fill", "risk": "write", "target": "main:textbox \"User ID\""}
+{"seq": 4, "ts": "2026-10-25T03:21:55.790+00:00", "t_ms": 875, "type": "step_completed", "step": "so1"}
+{"seq": 5, "ts": "2026-10-25T03:21:55.801+00:00", "t_ms": 890, "type": "step_started", "step": "so2", "intent": "Enter teller password", "action": "fill", "risk": "write", "target": "main:textbox \"Password\""}
+{"seq": 6, "ts": "2026-10-25T03:21:55.823+00:00", "t_ms": 905, "type": "step_completed", "step": "so2"}
+{"seq": 7, "ts": "2026-10-25T03:21:55.838+00:00", "t_ms": 922, "type": "step_started", "step": "so3", "intent": "Submit sign-on", "action": "click", "risk": "read", "target": "main:button \"Sign On\""}
+{"seq": 8, "ts": "2026-10-25T03:21:56.139+00:00", "t_ms": 1234, "type": "step_completed", "step": "so3"}
+{"seq": 9, "ts": "2026-10-25T03:21:56.148+00:00", "t_ms": 1234, "type": "flow_completed", "flow": "sign_on"}
+{"seq": 10, "ts": "2026-10-25T03:21:56.157+00:00", "t_ms": 1250, "type": "step_started", "step": "s1", "intent": "Activate link \"Member Inquiry\"", "action": "click", "risk": "read", "target": "nav:link \"Member Inquiry\""}
+{"seq": 11, "ts": "2026-10-25T03:21:56.435+00:00", "t_ms": 1530, "type": "step_completed", "step": "s1"}
+{"seq": 12, "ts": "2026-10-25T03:21:56.444+00:00", "t_ms": 1530, "type": "step_started", "step": "s2", "intent": "Enter {member_id} into \"Member Number\"", "action": "fill", "risk": "read", "target": "main:textbox \"Member Number\""}
+{"seq": 13, "ts": "2026-10-25T03:21:56.463+00:00", "t_ms": 1547, "type": "step_completed", "step": "s2"}
+{"seq": 14, "ts": "2026-10-25T03:21:56.472+00:00", "t_ms": 1562, "type": "step_started", "step": "s3", "intent": "Activate button \"Search\"", "action": "click", "risk": "read", "target": "main:button \"Search\""}
+{"seq": 15, "ts": "2026-10-25T03:21:56.750+00:00", "t_ms": 1844, "type": "step_completed", "step": "s3"}
+{"seq": 16, "ts": "2026-10-25T03:21:56.756+00:00", "t_ms": 1844, "type": "step_started", "step": "s4", "intent": "Activate link \"Open Sub-Account\"", "action": "click", "risk": "read", "target": "main:link \"Open Sub-Account\""}
+{"seq": 17, "ts": "2026-10-25T03:21:57.015+00:00", "t_ms": 2109, "type": "step_completed", "step": "s4"}
+{"seq": 18, "ts": "2026-10-25T03:21:57.019+00:00", "t_ms": 2109, "type": "step_started", "step": "s5", "intent": "Choose option in \"Share Type\"", "action": "select", "risk": "read", "target": "main:combobox \"Share Type\""}
+{"seq": 19, "ts": "2026-10-25T03:21:57.038+00:00", "t_ms": 2125, "type": "step_completed", "step": "s5"}
+{"seq": 20, "ts": "2026-10-25T03:21:57.043+00:00", "t_ms": 2125, "type": "step_started", "step": "s6", "intent": "Enter {nickname} into \"Nickname\"", "action": "fill", "risk": "read", "target": "main:textbox \"Nickname\""}
+{"seq": 21, "ts": "2026-10-25T03:21:57.051+00:00", "t_ms": 2140, "type": "step_completed", "step": "s6"}
+{"seq": 22, "ts": "2026-10-25T03:21:57.058+00:00", "t_ms": 2140, "type": "step_started", "step": "s7", "intent": "Enter {initial_deposit} into \"Initial Deposit\"", "action": "fill", "risk": "read", "target": "main:textbox \"Initial Deposit\""}
+{"seq": 23, "ts": "2026-10-25T03:21:57.066+00:00", "t_ms": 2155, "type": "step_completed", "step": "s7"}
+{"seq": 24, "ts": "2026-10-25T03:21:57.072+00:00", "t_ms": 2155, "type": "step_started", "step": "s8", "intent": "Activate button \"Continue\"", "action": "click", "risk": "write", "target": "main:button \"Continue\""}
+{"seq": 25, "ts": "2026-10-25T03:21:57.342+00:00", "t_ms": 2437, "type": "step_completed", "step": "s8"}
+{"seq": 26, "ts": "2026-10-25T03:21:57.348+00:00", "t_ms": 2437, "type": "step_started", "step": "s9", "intent": "Activate button \"Confirm\"", "action": "click", "risk": "irreversible", "target": "main:button \"Confirm\""}
+{"seq": 27, "ts": "2026-10-25T03:21:57.407+00:00", "t_ms": 2500, "type": "intervention_requested", "request": "req-5811b3", "kind": "approval", "reason": "Step 'Activate button \"Confirm\"' is irreversible. Approve to let automation perform it, deny to stop, or take control, perform it yourself, and resume.", "step": "s9", "allowed": ["approve", "deny", "resume"], "screenshot": "screenshots/req-5811b3.png"}
+{"seq": 28, "ts": "2026-10-25T03:21:57.688+00:00", "t_ms": 2780, "type": "intervention_resolved", "request": "req-5811b3", "decision": "deny", "by": "sim-operator", "note": "Deposit amount not authorised by member.", "human_actions": 0}
+{"seq": 29, "ts": "2026-10-25T03:21:57.720+00:00", "t_ms": 2812, "type": "replay_failed", "code": "approval_denied", "message": "operator sim-operator denied: Deposit amount not authorised by member.", "step_id": "s9", "step_intent": "Activate button \"Confirm\"", "observed": {"frames": [{"frame": null, "path": "/", "title": "CoreTeller", "text": ""}, {"frame": "nav", "path": "/nav", "title": "MENU", "text": "Home\t|\tMember Inquiry\t|\tSign Off"}, {"frame": "main", "path": "/sub/review", "title": "REVIEW SUB-ACCOUNT", "text": "FIRST COMMUNITY CU \u00a0-\u00a0 CORETELLER 4.2\t10/24/2026\n\nPLEASE REVIEW. THIS ACTION CANNOT BE UNDONE.\n\n\nMember:\t***42\nShare Type:\tVACATION CLUB\nNickname:\t***CH\nInitial Deposit:\t$75.00\n\n"}]}, "evidence": {"screenshot": "screenshots/failure-2.png", "dom": "dom/failure-2.txt"}}

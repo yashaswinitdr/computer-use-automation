@@ -1,0 +1,18 @@
+coreteller.member.open_sub_account@1.0.0  [draft]  risk=irreversible  app=acme-coreteller@4.2
+  Open member sub-account
+  Opens a new share sub-account for an existing member and returns the host confirmation number.
+  inputs:  member_id:string(pii), share_type:enum(internal), nickname:string(pii), initial_deposit:decimal(internal)
+  outputs: confirmation_number:string(internal), suffix:string(internal)
+  business outcomes: member_not_found, access_restricted, invalid_input
+    s1 [read        ] click    nav:link "Member Inquiry"   => route=/inq ; title=MEMBER INQUIRY
+    s2 [read        ] fill     main:textbox "Member Number" <- {member_id}
+    s3 [read        ] click    main:button "Search"   => route=/mbr/{member_id} ; title=MEMBER SUMMARY
+    s4 [read        ] click    main:link "Open Sub-Account"   => route=/sub/new ; title=OPEN SUB-ACCOUNT
+    s5 [read        ] select   main:combobox "Share Type" <- {share_type}
+    s6 [read        ] fill     main:textbox "Nickname" <- {nickname}
+    s7 [read        ] fill     main:textbox "Initial Deposit" <- {initial_deposit}
+    s8 [write       ] click    main:button "Continue"   => route=/sub/review ; title=REVIEW SUB-ACCOUNT
+    s9 [irreversible] click    main:button "Confirm"   => route=/sub/confirm ; title=SUB-ACCOUNT OPENED
+   s10 [read        ] extract  confirmation_number
+   s11 [read        ] extract  suffix
+  success: {"kind":"route","frame":"main","pattern":"/sub/confirm"} ; {"kind":"title","frame":"main","equals":"SUB-ACCOUNT OPENED"} ; {"kind":"text","contains":"OPENED"}

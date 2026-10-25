@@ -1,0 +1,153 @@
+[
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "nav",
+    "role": "link",
+    "name": "Member Inquiry",
+    "nth": 0,
+    "css": "body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > a:nth-of-type(1)",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "Select Member Inquiry to start the lookup process.",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/home",
+        "MAIN MENU"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "fill",
+    "frame": "main",
+    "role": "textbox",
+    "name": "Member Number",
+    "nth": 0,
+    "css": "input[name=\"q\"]",
+    "text": "***42",
+    "param": "member_id",
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "Enter the member ID to initiate the search.",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "main",
+    "role": "button",
+    "name": "Search",
+    "nth": 0,
+    "css": "input[type=\"button\"][value=\"Search\"]",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "Click the Search button to initiate the member inquiry.",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/mbr/***42",
+        "MEMBER SUMMARY"
+      ]
+    ]
+  },
+  {
+    "source": "model",
+    "action": "extract",
+    "frame": null,
+    "role": null,
+    "name": null,
+    "nth": 0,
+    "css": null,
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": {
+      "output": "share_savings_balance",
+      "source": {
+        "kind": "table_cell",
+        "frame": "main",
+        "row_key_column": "Description",
+        "row_key": {
+          "kind": "literal",
+          "value": "SHARE SAVINGS"
+        },
+        "column": "Balance"
+      },
+      "row_key_param": null
+    },
+    "rationale": "Extract the current balance for the SHARE SAVINGS account.",
+    "before": [],
+    "after": []
+  }
+]

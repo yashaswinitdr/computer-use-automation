@@ -1,0 +1,11 @@
+coreteller.member.savings_balance@1.0.0  [draft]  risk=read  app=acme-coreteller@4.2
+  Member share savings balance
+  Looks up a member by member number and returns the current balance of their share savings account.
+  inputs:  member_id:string(pii)
+  outputs: share_savings_balance:money(internal)
+  business outcomes: member_not_found, access_restricted, invalid_input
+    s1 [read        ] click    nav:link "Member Inquiry"   => route=/inq ; title=MEMBER INQUIRY
+    s2 [read        ] fill     main:textbox "Member Number" <- {member_id}
+    s3 [read        ] click    main:button "Search"   => route=/mbr/{member_id} ; title=MEMBER SUMMARY
+    s4 [read        ] extract  share_savings_balance
+  success: {"kind":"route","frame":"main","pattern":"/mbr/{member_id}"} ; {"kind":"title","frame":"main","equals":"MEMBER SUMMARY"}

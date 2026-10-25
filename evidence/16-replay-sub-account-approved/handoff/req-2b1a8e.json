@@ -1,0 +1,45 @@
+{
+  "id": "req-2b1a8e",
+  "run_id": "replay-20261024-232151-ab49",
+  "kind": "approval",
+  "reason": "Step 'Activate button \"Confirm\"' is irreversible. Approve to let automation perform it, deny to stop, or take control, perform it yourself, and resume.",
+  "subject": "coreteller.member.open_sub_account@1.0.0",
+  "step_id": "s9",
+  "step_intent": "Activate button \"Confirm\"",
+  "proposed_action": "click main:button \"Confirm\"",
+  "state": [
+    {
+      "frame": null,
+      "path": "/",
+      "title": "CoreTeller",
+      "text": ""
+    },
+    {
+      "frame": "nav",
+      "path": "/nav",
+      "title": "MENU",
+      "text": "Home\t|\tMember Inquiry\t|\tSign Off"
+    },
+    {
+      "frame": "main",
+      "path": "/sub/review",
+      "title": "REVIEW SUB-ACCOUNT",
+      "text": "FIRST COMMUNITY CU  -  CORETELLER 4.2\t10/24/2026\n\nPLEASE REVIEW. THIS ACTION CANNOT BE UNDONE.\n\n\nMember:\t***42\nShare Type:\tVACATION CLUB\nNickname:\t***CH\nInitial Deposit:\t$75.00\n\n"
+    }
+  ],
+  "screenshot": "screenshots/req-2b1a8e.png",
+  "allowed_decisions": [
+    "approve",
+    "deny",
+    "resume"
+  ],
+  "status": "resolved",
+  "created_at": "2026-10-25T03:21:53+00:00",
+  "claimed_by": null,
+  "claimed_at": null,
+  "decision": "approve",
+  "note": "Reviewed amount and member; OK to commit.",
+  "resolved_by": "sim-operator",
+  "resolved_at": "2026-10-25T03:21:53+00:00",
+  "human_actions": []
+}

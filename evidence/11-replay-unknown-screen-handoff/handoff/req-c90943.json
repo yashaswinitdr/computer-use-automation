@@ -1,0 +1,55 @@
+{
+  "id": "req-c90943",
+  "run_id": "replay-20261024-231852-ad98",
+  "kind": "stuck",
+  "reason": "postcondition not reached and screen matches no known state",
+  "subject": "coreteller.member.savings_balance@1.0.0",
+  "step_id": "s1",
+  "step_intent": "Activate link \"Member Inquiry\"",
+  "proposed_action": null,
+  "state": [
+    {
+      "frame": null,
+      "path": "/",
+      "title": "CoreTeller",
+      "text": ""
+    },
+    {
+      "frame": "nav",
+      "path": "/nav",
+      "title": "MENU",
+      "text": "Home\t|\tMember Inquiry\t|\tSign Off"
+    },
+    {
+      "frame": "main",
+      "path": "/inq",
+      "title": "TELLER SURVEY",
+      "text": "FIRST COMMUNITY CU  -  CORETELLER 4.2\t10/24/2026\n\nQUICK TELLER SURVEY\n\nHOW SATISFIED ARE YOU WITH CORETELLER 4.2?\n\n\nVERY SATISFIED\nSATISFIED\nNOT SATISFIED\n\n\n"
+    }
+  ],
+  "screenshot": "screenshots/req-c90943.png",
+  "allowed_decisions": [
+    "resume",
+    "abort"
+  ],
+  "status": "resolved",
+  "created_at": "2026-10-25T03:19:03+00:00",
+  "claimed_by": "sim-operator",
+  "claimed_at": "2026-10-25T03:19:03+00:00",
+  "decision": "resume",
+  "note": "Unknown survey screen; dismissed with 'Remind Me Later'. Consider adding it to the app profile.",
+  "resolved_by": "sim-operator",
+  "resolved_at": "2026-10-25T03:19:05+00:00",
+  "human_actions": [
+    {
+      "role": "button",
+      "name": "Remind Me Later",
+      "nth": 0,
+      "frame": "main",
+      "path": "/inq",
+      "css": "input[type=\"submit\"][value=\"Remind Me Later\"]",
+      "action": "click",
+      "at": "2026-10-25T03:19:03+00:00"
+    }
+  ]
+}

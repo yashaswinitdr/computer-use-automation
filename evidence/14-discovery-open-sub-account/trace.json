@@ -1,0 +1,82 @@
+[
+  {
+    "source": "model",
+    "action": "click",
+    "frame": "nav",
+    "role": "link",
+    "name": "Home",
+    "nth": 0,
+    "css": "body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(1) > a:nth-of-type(1)",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "Start from the main menu to access account management functions",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/home",
+        "MAIN MENU"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/home",
+        "MAIN MENU"
+      ]
+    ]
+  },
+  {
+    "source": "human",
+    "action": "click",
+    "frame": "nav",
+    "role": "link",
+    "name": "Member Inquiry",
+    "nth": 0,
+    "css": "body > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(3) > a:nth-of-type(1)",
+    "text": null,
+    "param": null,
+    "key": null,
+    "options": [],
+    "risk": "read",
+    "extract": null,
+    "rationale": "performed by human operator",
+    "before": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/home",
+        "MAIN MENU"
+      ]
+    ],
+    "after": [
+      [
+        "nav",
+        "/nav",
+        "MENU"
+      ],
+      [
+        "main",
+        "/inq",
+        "MEMBER INQUIRY"
+      ]
+    ]
+  }
+]

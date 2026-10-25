@@ -20,7 +20,7 @@ recorder: trace ─► Capability  ·  AppProfile (per product version)  ·  Ten
   - This is cheap and deterministic, and refs map one-to-one onto recordable targets.
   - Screenshots are captured anyway, as evidence.
   - The trade-off: this approach needs a readable surface (DOM, or UIA on desktop). Pixel-only surfaces need a vision-grounding implementation of the same `Surface` protocol (§4).
-- **A stateless, one-action-per-turn loop.** Each turn sends the goal, the parameters, a compact history and the *current* observation. Prompts stay bounded, each decision is independently logged, and providers are interchangeable (Anthropic `claude-opus-5` by default; OpenAI adapter; a scripted stand-in for tests). The loop owns every safety decision; the model only proposes.
+- **A stateless, one-action-per-turn loop.** Each turn sends the goal, the parameters, a compact history and the *current* observation. Prompts stay bounded, each decision is independently logged, and providers are interchangeable (Anthropic `claude-opus-5` by default; OpenAI; a local model through Ollama; a scripted stand-in for tests). The evidence discovery runs used **Qwen 2.5 7B locally via Ollama**: no API key, and screen data never leaves the machine, which is also the posture a bank would want for discovery on real screens. The loop owns every safety decision; the model only proposes.
 - **Why a single process:** replay is the production path, and it is a function `replay(capability, inputs, tenant) → ReplayResult`. The handoff store is file-based, so the operator side already runs out-of-process. A queue or worker pool can wrap this later without changing the contract.
 
 ## 2. Artifact schema
@@ -180,6 +180,15 @@ A prompt-injected model therefore cannot reach anything the policy does not allo
 - **Step-level tenant overlays:** only caption aliases are implemented.
 - **Bounded LLM "assisted fallback" in replay:** today a stuck replay goes to a human, never to a model.
 - **Trace pruning:** the recorder keeps every successful action, so a model detour becomes a step. Reviewers see and can edit this.
+
+**What a small local model taught the harness.** Discovery for the evidence ran on a 7B model on a laptop CPU. It completed the lookup flow on its own, but not the longer sub-account form (run `14`; see the README for how that capability was recorded instead). Its failure modes were useful, and each became a general guard rather than a prompt tweak for this app:
+
+- **Grounding check:** every UI action must also name the control it means, and a mismatch with the ref is rejected with the correct ref, so a mis-click never happens silently. Name formatting is ignored when comparing.
+- **Text-form tool calls:** a tool call written into the message text is accepted only if it names a known tool with a JSON-object argument. Anything else is sent back to the model with an instruction to call exactly one tool.
+- **Unverifiable success text is discarded, not recorded:** an invented confirmation phrase would become a checkpoint that replay could never meet.
+- **Sensitivity is decided by policy, not the model:** the model labelled a member's name `internal`. Values under the app profile's PII captions are now forced to `pii`.
+- **Symbolic parameters:** the model may type `{member_id}`, which the harness resolves to the value. It once typed the parameter's name literally, and the host rejected it.
+- **Stuck detection and handoff carry weak models:** loops and repeated failures are caught within three steps, and a human can steer once and hand back.
 
 **Built beyond the core:** two optional stretch goals. One is the agent-facing catalog / `invoke`. The other is approval gating (`draft → approved`), with `unattended_irreversible` for irreversible steps.
 

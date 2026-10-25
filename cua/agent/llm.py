@@ -105,6 +105,27 @@ class OpenAILLM:
         return ToolCall(tc.function.name, args, msg.content, usage)
 
 
+def _parse_text_tool_call(text: str, names: set[str]) -> tuple[str, dict[str, Any]] | None:
+    """Some local models write the tool call into the message text instead of the tool_calls field, as
+    `finish {...}`, `<tool_call>{"name": ..., "arguments": {...}}</tool_call>` or a bare JSON object.
+    Accept it only if it names a known tool and its arguments are a JSON object; the decision is unchanged."""
+    import re
+
+    t = re.sub(r"</?tool_call>|```(?:json)?", "", text).strip()
+    m = re.match(r"^([a-z_]+)\s*(\{.*\})\s*$", t, re.S)
+    try:
+        if m and m.group(1) in names:
+            args = json.loads(m.group(2))
+            return (m.group(1), args) if isinstance(args, dict) else None
+        obj = json.loads(t)
+    except json.JSONDecodeError:
+        return None
+    if isinstance(obj, dict) and obj.get("name") in names:
+        args = obj.get("arguments") or obj.get("parameters") or {}
+        return (obj["name"], args) if isinstance(args, dict) else None
+    return None
+
+
 class OllamaLLM:
     """Local model served by Ollama (no API key; screen data never leaves the machine).
 
@@ -140,6 +161,9 @@ class OllamaLLM:
         usage = {"input_tokens": resp.get("prompt_eval_count"), "output_tokens": resp.get("eval_count")}
         calls = msg.get("tool_calls") or []
         if not calls:
+            parsed = _parse_text_tool_call(msg.get("content") or "", {t["name"] for t in tools})
+            if parsed:
+                return ToolCall(parsed[0], parsed[1], msg.get("content"), usage | {"parsed_from_text": True})
             return ToolCall("none", {}, msg.get("content"), usage)
         fn = calls[0]["function"]
         args = fn.get("arguments") or {}

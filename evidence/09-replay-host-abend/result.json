@@ -1,0 +1,46 @@
+{
+  "status": "failed",
+  "capability": "coreteller.member.savings_balance@1.0.0",
+  "run_id": "replay-20261024-231837-dd03",
+  "tenant_id": "fccu",
+  "outputs": {},
+  "outcome": null,
+  "failure": {
+    "code": "host_error",
+    "message": "host_abend: ABEND S0C7 - TRANSACTION TERMINATED. CONTACT HELP DESK. REF 5DA382",
+    "step_id": "s3",
+    "step_intent": "Activate button \"Search\"",
+    "expected": null,
+    "observed": {
+      "frames": [
+        {
+          "frame": null,
+          "path": "/",
+          "title": "CoreTeller",
+          "text": ""
+        },
+        {
+          "frame": "nav",
+          "path": "/nav",
+          "title": "MENU",
+          "text": "Home\t|\tMember Inquiry\t|\tSign Off"
+        },
+        {
+          "frame": "main",
+          "path": "/inq",
+          "title": "SYSTEM ERROR",
+          "text": "FIRST COMMUNITY CU \u00a0-\u00a0 CORETELLER 4.2\t10/24/2026\n\nABEND S0C7 - TRANSACTION TERMINATED. CONTACT HELP DESK. REF 5DA382\n\n"
+        }
+      ]
+    },
+    "evidence": {
+      "screenshot": "screenshots/failure-1.png",
+      "dom": "dom/failure-1.txt"
+    }
+  },
+  "recoveries": [],
+  "drift": [],
+  "interventions": [],
+  "steps_completed": 2,
+  "duration_ms": 1155
+}

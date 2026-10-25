@@ -252,10 +252,14 @@ class SimulatedOperator:
         self._handled: set[str] = set()
 
     def tick(self, req: InterventionRequest, store: HandoffStore, surface: Any) -> None:
-        if req.id in self._handled or req.status == "resolved" or not self.script:
+        if req.id in self._handled or req.status == "resolved":
             return
-        plan = self.script.pop(0)
         self._handled.add(req.id)
+        plan = next((p for p in self.script if p.get("kind", req.kind) == req.kind), None)
+        if plan is None:  # nothing scripted for this kind of request: a real operator would abort it
+            store.resolve(req.run_id, req.id, "abort", self.name, f"no scripted response for a '{req.kind}' request")
+            return
+        self.script.remove(plan)
         if plan.get("claim", True):
             store.claim(req.run_id, req.id, self.name)
             surface.pause(300)

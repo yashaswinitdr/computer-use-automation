@@ -1,0 +1,9 @@
+{
+  "status": "succeeded",
+  "run_id": "discover-20261024-232144-b99a",
+  "artifact": "capabilities\\coreteller.member.open_sub_account@1.0.0.json",
+  "outputs_seen_during_discovery": [
+    "confirmation_number",
+    "suffix"
+  ]
+}

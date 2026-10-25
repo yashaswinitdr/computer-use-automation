@@ -1,0 +1,18 @@
+{
+  "status": "business_outcome",
+  "capability": "coreteller.member.open_sub_account@1.0.0",
+  "run_id": "replay-20261024-232158-50d5",
+  "tenant_id": "fccu",
+  "outputs": {},
+  "outcome": {
+    "code": "invalid_input",
+    "message": "ERR 1102: INVALID DEPOSIT AMOUNT (0.00 - 5,000.00)",
+    "step_id": "s8"
+  },
+  "failure": null,
+  "recoveries": [],
+  "drift": [],
+  "interventions": [],
+  "steps_completed": 7,
+  "duration_ms": 1750
+}

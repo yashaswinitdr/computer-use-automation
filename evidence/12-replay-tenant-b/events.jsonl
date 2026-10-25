@@ -1,0 +1,19 @@
+{"seq": 1, "ts": "2026-10-25T03:19:07.169+00:00", "t_ms": 609, "type": "replay_started", "capability": "coreteller.member.savings_balance@1.0.0", "status": "approved", "tenant": "rvfcu", "inputs": ["member_id"]}
+{"seq": 2, "ts": "2026-10-25T03:19:07.300+00:00", "t_ms": 734, "type": "flow_started", "flow": "sign_on"}
+{"seq": 3, "ts": "2026-10-25T03:19:07.319+00:00", "t_ms": 750, "type": "step_started", "step": "so1", "intent": "Enter teller user id", "action": "fill", "risk": "write", "target": "main:textbox \"User ID\""}
+{"seq": 4, "ts": "2026-10-25T03:19:07.365+00:00", "t_ms": 797, "type": "step_completed", "step": "so1"}
+{"seq": 5, "ts": "2026-10-25T03:19:07.377+00:00", "t_ms": 813, "type": "step_started", "step": "so2", "intent": "Enter teller password", "action": "fill", "risk": "write", "target": "main:textbox \"Password\""}
+{"seq": 6, "ts": "2026-10-25T03:19:07.400+00:00", "t_ms": 829, "type": "step_completed", "step": "so2"}
+{"seq": 7, "ts": "2026-10-25T03:19:07.414+00:00", "t_ms": 844, "type": "step_started", "step": "so3", "intent": "Submit sign-on", "action": "click", "risk": "read", "target": "main:button \"Sign On\""}
+{"seq": 8, "ts": "2026-10-25T03:19:07.728+00:00", "t_ms": 1157, "type": "step_completed", "step": "so3"}
+{"seq": 9, "ts": "2026-10-25T03:19:07.735+00:00", "t_ms": 1172, "type": "flow_completed", "flow": "sign_on"}
+{"seq": 10, "ts": "2026-10-25T03:19:07.742+00:00", "t_ms": 1172, "type": "step_started", "step": "s1", "intent": "Activate link \"Member Inquiry\"", "action": "click", "risk": "read", "target": "nav:link \"Member Inquiry\""}
+{"seq": 11, "ts": "2026-10-25T03:19:08.020+00:00", "t_ms": 1454, "type": "step_completed", "step": "s1"}
+{"seq": 12, "ts": "2026-10-25T03:19:08.027+00:00", "t_ms": 1454, "type": "step_started", "step": "s2", "intent": "Enter {member_id} into \"Member Number\"", "action": "fill", "risk": "read", "target": "main:textbox \"Member Number\""}
+{"seq": 13, "ts": "2026-10-25T03:19:08.043+00:00", "t_ms": 1469, "type": "step_completed", "step": "s2"}
+{"seq": 14, "ts": "2026-10-25T03:19:08.050+00:00", "t_ms": 1484, "type": "step_started", "step": "s3", "intent": "Activate button \"Search\"", "action": "click", "risk": "read", "target": "main:button \"Search\""}
+{"seq": 15, "ts": "2026-10-25T03:19:08.316+00:00", "t_ms": 1750, "type": "step_completed", "step": "s3"}
+{"seq": 16, "ts": "2026-10-25T03:19:08.320+00:00", "t_ms": 1750, "type": "step_started", "step": "s4", "intent": "Read output 'share_savings_balance'", "action": "extract", "risk": "read", "target": null}
+{"seq": 17, "ts": "2026-10-25T03:19:08.325+00:00", "t_ms": 1750, "type": "output_extracted", "step": "s4", "output": "share_savings_balance", "value": "1234.56"}
+{"seq": 18, "ts": "2026-10-25T03:19:08.325+00:00", "t_ms": 1750, "type": "step_completed", "step": "s4"}
+{"seq": 19, "ts": "2026-10-25T03:19:08.330+00:00", "t_ms": 1766, "type": "replay_succeeded", "outputs": {"share_savings_balance": "1234.56"}}

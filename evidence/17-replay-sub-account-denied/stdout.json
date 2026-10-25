@@ -1,0 +1,46 @@
+{
+  "status": "failed",
+  "capability": "coreteller.member.open_sub_account@1.0.0",
+  "run_id": "replay-20261024-232154-295e",
+  "tenant_id": "fccu",
+  "outputs": {},
+  "failure": {
+    "code": "approval_denied",
+    "message": "operator sim-operator denied: Deposit amount not authorised by member.",
+    "step_id": "s9",
+    "step_intent": "Activate button \"Confirm\"",
+    "observed": {
+      "frames": [
+        {
+          "frame": null,
+          "path": "/",
+          "title": "CoreTeller",
+          "text": ""
+        },
+        {
+          "frame": "nav",
+          "path": "/nav",
+          "title": "MENU",
+          "text": "Home\t|\tMember Inquiry\t|\tSign Off"
+        },
+        {
+          "frame": "main",
+          "path": "/sub/review",
+          "title": "REVIEW SUB-ACCOUNT",
+          "text": "FIRST COMMUNITY CU \u00a0-\u00a0 CORETELLER 4.2\t10/24/2026\n\nPLEASE REVIEW. THIS ACTION CANNOT BE UNDONE.\n\n\nMember:\t***42\nShare Type:\tVACATION CLUB\nNickname:\t***CH\nInitial Deposit:\t$75.00\n\n"
+        }
+      ]
+    },
+    "evidence": {
+      "screenshot": "screenshots/failure-2.png",
+      "dom": "dom/failure-2.txt"
+    }
+  },
+  "recoveries": [],
+  "drift": [],
+  "interventions": [
+    "req-5811b3"
+  ],
+  "steps_completed": 8,
+  "duration_ms": 2157
+}

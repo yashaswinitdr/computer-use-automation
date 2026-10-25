@@ -1,0 +1,7 @@
+[
+  {"kind": "stuck", "claim": true,
+   "actions": [{"type": "click", "frame": "nav", "role": "link", "name": "Member Inquiry", "pause_ms": 1200}],
+   "decision": "resume",
+   "note": "Sub-accounts are opened from the member's summary screen: look the member up via Member Inquiry first."},
+  {"kind": "approval", "claim": false, "decision": "approve", "note": "Reviewed member, type and amount; OK to commit."}
+]

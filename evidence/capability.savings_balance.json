@@ -1,0 +1,182 @@
+{
+  "schema": "cua.capability/v1",
+  "id": "coreteller.member.savings_balance",
+  "version": "1.0.0",
+  "status": "draft",
+  "title": "Member share savings balance",
+  "description": "Looks up a member by member number and returns the current balance of their share savings account.",
+  "app": {
+    "profile": "acme-coreteller",
+    "profile_version": "4.2"
+  },
+  "surface": "web",
+  "entry_route": "/",
+  "requires_session": true,
+  "inputs": {
+    "member_id": {
+      "type": "string",
+      "description": "member id (digits)",
+      "required": true,
+      "pattern": "^\\d{1,12}$",
+      "sensitivity": "pii"
+    }
+  },
+  "outputs": {
+    "share_savings_balance": {
+      "type": "money",
+      "description": "",
+      "sensitivity": "internal"
+    }
+  },
+  "outcomes": [
+    {
+      "code": "member_not_found",
+      "description": "No member exists with the supplied member number."
+    },
+    {
+      "code": "access_restricted",
+      "description": "The member record is restricted for this operator (permission denial)."
+    },
+    {
+      "code": "invalid_input",
+      "description": "The host rejected an input value (validation error ERR nnnn)."
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "intent": "Activate link \"Member Inquiry\"",
+      "action": {
+        "type": "click",
+        "target": {
+          "frame": "nav",
+          "role": "link",
+          "name": "Member Inquiry",
+          "nth": 0,
+          "fallbacks": []
+        }
+      },
+      "risk": "read",
+      "expect": {
+        "all_of": [
+          {
+            "kind": "route",
+            "frame": "main",
+            "pattern": "/inq"
+          },
+          {
+            "kind": "title",
+            "frame": "main",
+            "equals": "MEMBER INQUIRY"
+          }
+        ],
+        "timeout_ms": 10000
+      },
+      "source": "model"
+    },
+    {
+      "id": "s2",
+      "intent": "Enter {member_id} into \"Member Number\"",
+      "action": {
+        "type": "fill",
+        "target": {
+          "frame": "main",
+          "role": "textbox",
+          "name": "Member Number",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[name=\"q\"]"
+            }
+          ]
+        },
+        "value": {
+          "kind": "param",
+          "name": "member_id"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    },
+    {
+      "id": "s3",
+      "intent": "Activate button \"Search\"",
+      "action": {
+        "type": "click",
+        "target": {
+          "frame": "main",
+          "role": "button",
+          "name": "Search",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[type=\"button\"][value=\"Search\"]"
+            }
+          ]
+        }
+      },
+      "risk": "read",
+      "expect": {
+        "all_of": [
+          {
+            "kind": "route",
+            "frame": "main",
+            "pattern": "/mbr/{member_id}"
+          },
+          {
+            "kind": "title",
+            "frame": "main",
+            "equals": "MEMBER SUMMARY"
+          }
+        ],
+        "timeout_ms": 10000
+      },
+      "source": "model"
+    },
+    {
+      "id": "s4",
+      "intent": "Read output 'share_savings_balance'",
+      "action": {
+        "type": "extract",
+        "output": "share_savings_balance",
+        "source": {
+          "kind": "table_cell",
+          "frame": "main",
+          "row_key_column": "Description",
+          "row_key": {
+            "kind": "literal",
+            "value": "SHARE SAVINGS"
+          },
+          "column": "Balance"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    }
+  ],
+  "success": {
+    "all_of": [
+      {
+        "kind": "route",
+        "frame": "main",
+        "pattern": "/mbr/{member_id}"
+      },
+      {
+        "kind": "title",
+        "frame": "main",
+        "equals": "MEMBER SUMMARY"
+      }
+    ],
+    "timeout_ms": 10000
+  },
+  "provenance": {
+    "method": "llm_discovery",
+    "created_at": "2026-10-25T03:18:04.053820Z",
+    "discovery_run_id": "discover-20261024-231556-ab35",
+    "model": "qwen2.5:7b",
+    "goal_template": "Look up member {member_id} and read their current share savings balance",
+    "human_steps": 0
+  }
+}

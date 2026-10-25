@@ -1,0 +1,405 @@
+{
+  "schema": "cua.capability/v1",
+  "id": "coreteller.member.open_sub_account",
+  "version": "1.0.0",
+  "status": "approved",
+  "title": "Open member sub-account",
+  "description": "Opens a new share sub-account for an existing member and returns the host confirmation number.",
+  "app": {
+    "profile": "acme-coreteller",
+    "profile_version": "4.2"
+  },
+  "surface": "web",
+  "entry_route": "/",
+  "requires_session": true,
+  "inputs": {
+    "member_id": {
+      "type": "string",
+      "description": "member id (digits)",
+      "required": true,
+      "pattern": "^\\d{1,12}$",
+      "sensitivity": "pii"
+    },
+    "share_type": {
+      "type": "enum",
+      "description": "share type (one of the host's options)",
+      "required": true,
+      "enum": [
+        "SAVINGS",
+        "HOLIDAY CLUB",
+        "VACATION CLUB",
+        "MONEY MARKET"
+      ],
+      "sensitivity": "internal"
+    },
+    "nickname": {
+      "type": "string",
+      "description": "nickname",
+      "required": true,
+      "sensitivity": "pii"
+    },
+    "initial_deposit": {
+      "type": "decimal",
+      "description": "initial deposit",
+      "required": true,
+      "sensitivity": "internal"
+    }
+  },
+  "outputs": {
+    "confirmation_number": {
+      "type": "string",
+      "description": "Host confirmation number",
+      "sensitivity": "internal"
+    },
+    "suffix": {
+      "type": "string",
+      "description": "Suffix of the new sub-account",
+      "sensitivity": "internal"
+    }
+  },
+  "outcomes": [
+    {
+      "code": "member_not_found",
+      "description": "No member exists with the supplied member number."
+    },
+    {
+      "code": "access_restricted",
+      "description": "The member record is restricted for this operator (permission denial)."
+    },
+    {
+      "code": "invalid_input",
+      "description": "The host rejected an input value (validation error ERR nnnn)."
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "intent": "Activate link \"Member Inquiry\"",
+      "action": {
+        "type": "click",
+        "target": {
+          "frame": "nav",
+          "role": "link",
+          "name": "Member Inquiry",
+          "nth": 0,
+          "fallbacks": []
+        }
+      },
+      "risk": "read",
+      "expect": {
+        "all_of": [
+          {
+            "kind": "route",
+            "frame": "main",
+            "pattern": "/inq"
+          },
+          {
+            "kind": "title",
+            "frame": "main",
+            "equals": "MEMBER INQUIRY"
+          }
+        ],
+        "timeout_ms": 10000
+      },
+      "source": "model"
+    },
+    {
+      "id": "s2",
+      "intent": "Enter {member_id} into \"Member Number\"",
+      "action": {
+        "type": "fill",
+        "target": {
+          "frame": "main",
+          "role": "textbox",
+          "name": "Member Number",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[name=\"q\"]"
+            }
+          ]
+        },
+        "value": {
+          "kind": "param",
+          "name": "member_id"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    },
+    {
+      "id": "s3",
+      "intent": "Activate button \"Search\"",
+      "action": {
+        "type": "click",
+        "target": {
+          "frame": "main",
+          "role": "button",
+          "name": "Search",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[type=\"button\"][value=\"Search\"]"
+            }
+          ]
+        }
+      },
+      "risk": "read",
+      "expect": {
+        "all_of": [
+          {
+            "kind": "route",
+            "frame": "main",
+            "pattern": "/mbr/{member_id}"
+          },
+          {
+            "kind": "title",
+            "frame": "main",
+            "equals": "MEMBER SUMMARY"
+          }
+        ],
+        "timeout_ms": 10000
+      },
+      "source": "model"
+    },
+    {
+      "id": "s4",
+      "intent": "Activate link \"Open Sub-Account\"",
+      "action": {
+        "type": "click",
+        "target": {
+          "frame": "main",
+          "role": "link",
+          "name": "Open Sub-Account",
+          "nth": 0,
+          "fallbacks": []
+        }
+      },
+      "risk": "read",
+      "expect": {
+        "all_of": [
+          {
+            "kind": "route",
+            "frame": "main",
+            "pattern": "/sub/new"
+          },
+          {
+            "kind": "title",
+            "frame": "main",
+            "equals": "OPEN SUB-ACCOUNT"
+          }
+        ],
+        "timeout_ms": 10000
+      },
+      "source": "model"
+    },
+    {
+      "id": "s5",
+      "intent": "Choose option in \"Share Type\"",
+      "action": {
+        "type": "select",
+        "target": {
+          "frame": "main",
+          "role": "combobox",
+          "name": "Share Type",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "select[name=\"x1\"]"
+            }
+          ]
+        },
+        "value": {
+          "kind": "param",
+          "name": "share_type"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    },
+    {
+      "id": "s6",
+      "intent": "Enter {nickname} into \"Nickname\"",
+      "action": {
+        "type": "fill",
+        "target": {
+          "frame": "main",
+          "role": "textbox",
+          "name": "Nickname",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[name=\"x2\"]"
+            }
+          ]
+        },
+        "value": {
+          "kind": "param",
+          "name": "nickname"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    },
+    {
+      "id": "s7",
+      "intent": "Enter {initial_deposit} into \"Initial Deposit\"",
+      "action": {
+        "type": "fill",
+        "target": {
+          "frame": "main",
+          "role": "textbox",
+          "name": "Initial Deposit",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[name=\"x9\"]"
+            }
+          ]
+        },
+        "value": {
+          "kind": "param",
+          "name": "initial_deposit"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    },
+    {
+      "id": "s8",
+      "intent": "Activate button \"Continue\"",
+      "action": {
+        "type": "click",
+        "target": {
+          "frame": "main",
+          "role": "button",
+          "name": "Continue",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[type=\"submit\"][value=\"Continue\"]"
+            }
+          ]
+        }
+      },
+      "risk": "write",
+      "expect": {
+        "all_of": [
+          {
+            "kind": "route",
+            "frame": "main",
+            "pattern": "/sub/review"
+          },
+          {
+            "kind": "title",
+            "frame": "main",
+            "equals": "REVIEW SUB-ACCOUNT"
+          }
+        ],
+        "timeout_ms": 10000
+      },
+      "source": "model"
+    },
+    {
+      "id": "s9",
+      "intent": "Activate button \"Confirm\"",
+      "action": {
+        "type": "click",
+        "target": {
+          "frame": "main",
+          "role": "button",
+          "name": "Confirm",
+          "nth": 0,
+          "fallbacks": [
+            {
+              "strategy": "css",
+              "value": "input[type=\"submit\"][value=\"Confirm\"]"
+            }
+          ]
+        }
+      },
+      "risk": "irreversible",
+      "expect": {
+        "all_of": [
+          {
+            "kind": "route",
+            "frame": "main",
+            "pattern": "/sub/confirm"
+          },
+          {
+            "kind": "title",
+            "frame": "main",
+            "equals": "SUB-ACCOUNT OPENED"
+          }
+        ],
+        "timeout_ms": 10000
+      },
+      "source": "model"
+    },
+    {
+      "id": "s10",
+      "intent": "Read output 'confirmation_number'",
+      "action": {
+        "type": "extract",
+        "output": "confirmation_number",
+        "source": {
+          "kind": "labeled_value",
+          "frame": "main",
+          "label": "Confirmation #"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    },
+    {
+      "id": "s11",
+      "intent": "Read output 'suffix'",
+      "action": {
+        "type": "extract",
+        "output": "suffix",
+        "source": {
+          "kind": "labeled_value",
+          "frame": "main",
+          "label": "Suffix"
+        }
+      },
+      "risk": "read",
+      "source": "model"
+    }
+  ],
+  "success": {
+    "all_of": [
+      {
+        "kind": "route",
+        "frame": "main",
+        "pattern": "/sub/confirm"
+      },
+      {
+        "kind": "title",
+        "frame": "main",
+        "equals": "SUB-ACCOUNT OPENED"
+      },
+      {
+        "kind": "text",
+        "contains": "OPENED"
+      }
+    ],
+    "timeout_ms": 10000
+  },
+  "provenance": {
+    "method": "llm_discovery",
+    "created_at": "2026-10-25T03:21:48.877908Z",
+    "discovery_run_id": "discover-20261024-232144-b99a",
+    "model": "scripted",
+    "goal_template": "Open a new {share_type} sub-account named {nickname} for member {member_id} with an initial deposit of {initial_deposit}, and return the confirmation number and the new suffix",
+    "human_steps": 0,
+    "reviewed_by": "demo-reviewer",
+    "reviewed_at": "2026-10-25T03:21:50.331493Z"
+  }
+}

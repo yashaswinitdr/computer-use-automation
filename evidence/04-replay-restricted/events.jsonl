@@ -1,0 +1,16 @@
+{"seq": 1, "ts": "2026-10-25T03:18:11.753+00:00", "t_ms": 594, "type": "replay_started", "capability": "coreteller.member.savings_balance@1.0.0", "status": "approved", "tenant": "fccu", "inputs": ["member_id"]}
+{"seq": 2, "ts": "2026-10-25T03:18:11.878+00:00", "t_ms": 719, "type": "flow_started", "flow": "sign_on"}
+{"seq": 3, "ts": "2026-10-25T03:18:11.896+00:00", "t_ms": 734, "type": "step_started", "step": "so1", "intent": "Enter teller user id", "action": "fill", "risk": "write", "target": "main:textbox \"User ID\""}
+{"seq": 4, "ts": "2026-10-25T03:18:11.938+00:00", "t_ms": 780, "type": "step_completed", "step": "so1"}
+{"seq": 5, "ts": "2026-10-25T03:18:11.947+00:00", "t_ms": 780, "type": "step_started", "step": "so2", "intent": "Enter teller password", "action": "fill", "risk": "write", "target": "main:textbox \"Password\""}
+{"seq": 6, "ts": "2026-10-25T03:18:11.967+00:00", "t_ms": 812, "type": "step_completed", "step": "so2"}
+{"seq": 7, "ts": "2026-10-25T03:18:11.981+00:00", "t_ms": 812, "type": "step_started", "step": "so3", "intent": "Submit sign-on", "action": "click", "risk": "read", "target": "main:button \"Sign On\""}
+{"seq": 8, "ts": "2026-10-25T03:18:12.274+00:00", "t_ms": 1109, "type": "step_completed", "step": "so3"}
+{"seq": 9, "ts": "2026-10-25T03:18:12.280+00:00", "t_ms": 1125, "type": "flow_completed", "flow": "sign_on"}
+{"seq": 10, "ts": "2026-10-25T03:18:12.287+00:00", "t_ms": 1125, "type": "step_started", "step": "s1", "intent": "Activate link \"Member Inquiry\"", "action": "click", "risk": "read", "target": "nav:link \"Member Inquiry\""}
+{"seq": 11, "ts": "2026-10-25T03:18:12.556+00:00", "t_ms": 1390, "type": "step_completed", "step": "s1"}
+{"seq": 12, "ts": "2026-10-25T03:18:12.562+00:00", "t_ms": 1405, "type": "step_started", "step": "s2", "intent": "Enter {member_id} into \"Member Number\"", "action": "fill", "risk": "read", "target": "main:textbox \"Member Number\""}
+{"seq": 13, "ts": "2026-10-25T03:18:12.577+00:00", "t_ms": 1422, "type": "step_completed", "step": "s2"}
+{"seq": 14, "ts": "2026-10-25T03:18:12.582+00:00", "t_ms": 1422, "type": "step_started", "step": "s3", "intent": "Activate button \"Search\"", "action": "click", "risk": "read", "target": "main:button \"Search\""}
+{"seq": 15, "ts": "2026-10-25T03:18:12.840+00:00", "t_ms": 1672, "type": "known_state_detected", "code": "access_restricted", "classification": "business", "step": "s3"}
+{"seq": 16, "ts": "2026-10-25T03:18:12.840+00:00", "t_ms": 1672, "type": "business_outcome", "code": "access_restricted", "message": "ACCESS DENIED - RESTRICTED ACCOUNT (SEC-403). REFER TO BSA OFFICER.", "step": "s3"}
