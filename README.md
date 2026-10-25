@@ -47,13 +47,15 @@ python -m playwright install chromium
 cp .env.example .env
 ```
 
-Discovery needs an LLM. Pick one:
+Discovery needs an LLM, and **no API key is required**. By default it runs a local model through
+[Ollama](https://ollama.com), so screen data never leaves the machine:
 
-- **Local, no API key (used for the evidence in this repo):** install [Ollama](https://ollama.com), then run
-  `ollama pull qwen2.5:7b` and pass `--provider ollama --model qwen2.5:7b`. Screen data never leaves the machine.
-  Set `OLLAMA_HOST` if the server isn't on the default `http://127.0.0.1:11434`.
-- **Hosted:** put `ANTHROPIC_API_KEY` (default provider, model `claude-opus-5`) or `OPENAI_API_KEY` (model
-  `gpt-4.1`) in `.env`.
+```bash
+ollama pull qwen2.5:7b
+```
+
+Set `OLLAMA_HOST` if Ollama isn't on the default `http://127.0.0.1:11434`. Hosted models are optional: pass
+`--provider anthropic` or `--provider openai` and put the matching key in `.env`.
 
 Override the choice with `--provider`/`--model` or `CUA_PROVIDER`/`CUA_MODEL`. Only discovery uses a model. Replay
 and all tests run without any live service. The teller credentials in `.env.example` are test values for the local
@@ -74,7 +76,7 @@ python -m cua app --variant b --port 5057
 **1. Discover** (real LLM run). This records `capabilities/coreteller.member.savings_balance@1.0.0.json`.
 
 ```bash
-python -m cua discover --provider ollama --model qwen2.5:7b --goal "Look up member {member_id} and read their current share savings balance" --param member_id=10042 --id coreteller.member.savings_balance --headed
+python -m cua discover --goal "Look up member {member_id} and read their current share savings balance" --param member_id=10042 --id coreteller.member.savings_balance --headed
 ```
 
 **2. Review and approve.** New artifacts are `draft`, and unattended replay requires `approved`.

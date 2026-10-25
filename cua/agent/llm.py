@@ -134,7 +134,7 @@ class OllamaLLM:
     """
 
     def __init__(self, model: str | None = None, host: str | None = None):
-        self.model = model or "llama3.2"
+        self.model = model or "qwen2.5:7b"
         self.host = (host or os.environ.get("OLLAMA_HOST") or "http://127.0.0.1:11434").rstrip("/")
 
     def decide(self, system: str, user: str, tools: list[dict[str, Any]], obs: Any = None) -> ToolCall:
@@ -208,7 +208,9 @@ class ScriptedLLM:
 
 
 def make_llm(provider: str | None, model: str | None, script: str | None = None) -> LLM:
-    provider = provider or os.environ.get("CUA_PROVIDER") or ("anthropic" if os.environ.get("ANTHROPIC_API_KEY") else "openai")
+    # Default: a local model through Ollama -- no API key, and screen data never leaves the machine.
+    # Hosted providers are opt-in via --provider / CUA_PROVIDER.
+    provider = provider or os.environ.get("CUA_PROVIDER") or "ollama"
     model = model or os.environ.get("CUA_MODEL")
     if provider == "scripted":
         if not script:
