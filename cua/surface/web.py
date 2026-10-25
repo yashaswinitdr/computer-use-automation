@@ -202,7 +202,7 @@ class WebSurface:
         self._seq = 0
         self._human_cb: Callable[[dict[str, Any]], None] | None = None
         self._pw = sync_playwright().start()
-        self._browser = self._pw.chromium.launch(headless=headless, slow_mo=slow_mo)
+        self._browser = self._launch(headless, slow_mo)
         self._ctx = self._browser.new_context(viewport={"width": 1100, "height": 720})
         self._ctx.route("**/*", self._guard)
         self._ctx.expose_binding("__cuaHuman", self._on_human)
@@ -213,6 +213,16 @@ class WebSurface:
         self.page.on("request", lambda r: self._pending.add(r) if r.is_navigation_request() else None)
         self.page.on("requestfinished", lambda r: self._pending.discard(r))
         self.page.on("requestfailed", lambda r: self._pending.discard(r))
+
+    def _launch(self, headless: bool, slow_mo: int):
+        if not headless:
+            # A visible window: prefer the locally installed Edge (some endpoint security blocks the bundled
+            # Chromium from opening a window); fall back to the bundled browser.
+            try:
+                return self._pw.chromium.launch(channel="msedge", headless=False, slow_mo=slow_mo)
+            except PWError:
+                pass
+        return self._pw.chromium.launch(headless=headless, slow_mo=slow_mo)
 
     # ------------------------------------------------------------------ guards / hooks
     def _bump(self) -> None:
